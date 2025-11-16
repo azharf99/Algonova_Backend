@@ -1,12 +1,23 @@
 from django.db import models
 from students.models import Student
-from django.utils.dates import WEEKDAYS
+from django.utils.translation import gettext_lazy as _
+import datetime
+
+WEEKDAYS = (
+    (1, _("Monday")),
+    (2, _("Tuesday")),
+    (3, _("Wednesday")),
+    (4, _("Thursday")),
+    (5, _("Friday")),
+    (6, _("Saturday")),
+    (7, _("Sunday")),
+)
 
 # Create your models here.
 class Group(models.Model):
     name = models.CharField(max_length=30)
     description = models.TextField(blank=True, null=True)
-    day_of_week = models.CharField(max_length=10, choices=WEEKDAYS.items())
+    day_of_week = models.CharField(max_length=10, choices=WEEKDAYS)
     start_time = models.DateTimeField(blank=True, null=True)
     end_time = models.DateTimeField(blank=True, null=True)
     students = models.ManyToManyField(Student, related_name='groups', blank=True)

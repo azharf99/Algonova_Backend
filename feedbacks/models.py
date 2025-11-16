@@ -1,9 +1,9 @@
 from django.db import models
-from students.models import Student
+from groups.models import Group
 
 # Create your models here.
 class Feedback(models.Model):
-    student_name = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='feedbacks')
+    group = models.ForeignKey(Group, on_delete=models.SET_NULL, related_name='feedbacks', null=True)
     number = models.PositiveBigIntegerField()
     message = models.TextField()
     is_sent = models.BooleanField(default=False)
@@ -11,7 +11,7 @@ class Feedback(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"Feedback {self.student_name} ({self.number})"
+        return f"Feedback {self.group} ({self.number})"
     
     class Meta:
         ordering = ['-created_at']
