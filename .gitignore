@@ -1,0 +1,13 @@
+.env
+__pycache__/
+*.__pycache__
+venv/
+db.sqlite3
+media/
+mediafiles/
+static/admin/
+staticfiles/
+.DS_Store
+.idea/
+.vscode/
+*.log
