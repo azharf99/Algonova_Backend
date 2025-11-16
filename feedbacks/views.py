@@ -2,15 +2,15 @@ from django.shortcuts import render
 from rest_framework import viewsets
 from feedbacks.models import Feedback
 from feedbacks.serializers import FeedbackSerializer
-from rest_framework.pagination import PageNumberPagination
 from rest_framework.throttling import UserRateThrottle, AnonRateThrottle
+from utils.pagination import StandardResultsSetPagination
 from utils.whatsapp import create_schedule
 # Create your views here.
 
 class FeedbackViewSet(viewsets.ModelViewSet):
     queryset = Feedback.objects.all()
     serializer_class = FeedbackSerializer
-    pagination_class = PageNumberPagination
+    pagination_class = StandardResultsSetPagination
     throttle_classes = [
         UserRateThrottle,
         AnonRateThrottle,
