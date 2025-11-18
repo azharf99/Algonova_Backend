@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{student_name}} - Rapor Bulan {{month_number}}</title>
+    <script src="tailwind.js"></script>
+</head>
+<body>
+    <div>
+        <img src="header.png" alt="Header Image" style="width:100%; height:auto;">
+    </div>
+
+    <div class="grid grid-cols-2 gap-4 p-4">
+        <div>
+            <h2 class="text-xl font-bold mb-2 text-center">Informasi Siswa</h2>
+            <div class="grid grid-cols-2 gap-2 mb-4">
+                <div class="font-semibold">Nama Siswa:</div>
+                <div>{{student_name}}</div>
+            </div>
+            <hr class="border border-2 border-blue-500">
+            <div class="grid grid-cols-2 gap-2 mb-4">
+                <div class="font-semibold">Kursus:</div>
+                <div>{{class_name}}</div>
+            </div>
+            <hr class="border border-2 border-blue-500">
+            <div class="grid grid-cols-2 gap-2 mb-4">
+                <div class="font-semibold">Lama Pelatihan:</div>
+                <div>Bulan ke-{{month_number}}</div>
+            </div>
+        </div>
+        <div class="text-center">
+            <h2 class="text-xl font-bold mb-2">Skor Total</h2>
+            <p class="text-lg">{{level}}</p>
+            <p class="text-3xl">⭐⭐⭐⭐⭐</p>
+        </div>
+        <div>
+            <div class="flex justify-center items-center gap-2 mb-4">
+                <img src="present.png" alt="Presentation" height="30px" width="30px">
+                <h2 class="text-xl font-bold mb-2 text-center">Proyek hasil Student</h2>
+            </div>
+            <div class="flex flex-col justify-center items-center mb-4">
+                <p>Proyek akhir diakses melalui link dibawah ini:</p>
+                <div class="flex justify-center items-center gap-2 mb-4">
+                    <img src="link.png" alt="Link" height="30px" width="30px">
+                    <p><a href="{{project_link}}" target="_blank">Proyek Akhir Bulan Ini</a></p>
+                </div>
+                
+            </div>
+        </div>
+        <div>
+            <div class="flex justify-center items-center gap-2 mb-4">
+                <img src="computer.png" alt="Computer" height="30px" width="30px">
+                <h2 class="text-xl font-bold mb-2 text-center">Free Lesson</h2>
+            </div>
+            <div class="flex flex-col justify-center items-center mb-4">
+                <div class="flex justify-center items-center gap-2 mb-4">
+                    <img src="gift.png" alt="Gift" height="30px" width="30px">
+                    <p>Mau dapatkan free lesson?</p>
+                </div>
+                <div class="flex justify-center items-center gap-2 mb-4">
+                    <img src="link.png" alt="Link" height="30px" width="30px">
+                    <p><a href="https://algonova.id/invite?utm_source=refferal&utm_medium=employee&utm_campaign=social_network&utm_content=hidin466" target="_blank">Bagikan link ini dan dapatkan reward class gratis!</a></p>
+                </div>
+            </div>
+        </div>
+        <div>
+            <div class="flex justify-center items-center gap-2 mb-4">
+                <img src="module.png" alt="Module" height="30px" width="30px">
+                <h2 class="text-xl font-bold mb-2 text-center">Tentang Modul Ini</h2>
+            </div>
+            <div class="flex justify-center gap-4 items-center mb-4">
+                <h3 class="text-xl font-semibold">Topik Modul</h3>
+                <p>Review dan Pengenalan Struktur Data Majemuk</p>                
+            </div>
+            <hr class="border border-2 border-blue-500">
+            <div class="flex justify-center gap-4 items-center mb-4">
+                <h3 class="text-xl font-semibold">Hasil</h3>
+                <p> Pada bulan pertama, siswa fokus pada 
+                    penanganan kesalahan dan pengecualian 
+                    dalam program Python, yang merupakan 
+                    keterampilan penting untuk mengatasi 
+                    masalah dalam kode. Mereka juga 
+                    memperdalam pemahaman mereka tentang 
+                    list dalam Python, termasuk review konsep
+                    konsep yang telah dipelajari sebelumnya. 
+                    Setelah itu, mereka diperkenalkan pada 
+                    penggunaan dictionary, yang memungkinkan 
+                    penyimpanan data dalam pasangan kunci-nilai. 
+                    Bulan ini diakhiri dengan eksplorasi struktur 
+                    data bersarang, di mana siswa belajar 
+                    bagaimana menangani data yang lebih 
+                    kompleks.</p>                
+            </div>
+            <hr class="border border-2 border-blue-500">
+            <p class="font-semibold">Menyelesaikan 1 dari 9 bulan pembelajaran di level IT HERO level 7 /9</p>
+        </div>
+        <div>
+            <div class="flex justify-center items-center gap-2 mb-4">
+                <img src="computer.png" alt="Computer" height="30px" width="30px">
+                <h2 class="text-xl font-bold mb-2 text-center">Keahlian yang Didapatkan</h2>
+            </div>
+            <p> Siswa mengembangkan keterampilan penting dalam 
+                penanganan kesalahan dan pengecualian dalam 
+                pemrograman Python, yang membantu mereka 
+                memahami cara mengatasi masalah dan meningkatkan 
+                keandalan kode. Selain itu, mereka memperdalam 
+                pemahaman tentang list, mempelajari berbagai metode 
+                dan teknik untuk mengelola koleksi data. Pengenalan 
+                terhadap dictionary memperluas kemampuan mereka 
+                dalam menyimpan dan mengakses data secara efisien 
+                menggunakan pasangan kunci-nilai. Terakhir, 
+                eksplorasi struktur data bersarang memungkinkan 
+                siswa untuk menangani dan memanipulasi data yang 
+                lebih kompleks, mempersiapkan mereka untuk proyek 
+                yang lebih menantang di masa mendatang.</p>                
+        </div>
+        <div class="text-center">
+            <h2 class="text-xl font-bold mb-2 text-center">Jalur Pendidikan</h2>
+            <img src="path.png" alt="Path">
+            <p class="font-semibold"> Informasi lebih lanjut dapat diakses melalui link berikut :</p>
+            <div class="flex justify-center items-center gap-2 mb-4">
+                <img src="link.png" alt="Link" height="30px" width="30px">
+                <p><a href="https://drive.google.com/drive/u/0/folders/1lErW_RKjHOkAgqCr9yymELg3yUZzvBEb" target="_blank">Lihat Modul Lengkap</a></p>
+            </div>
+        </div>
+        <div>
+            <div class="flex justify-center items-center gap-2 mb-4">
+                <img src="feedback.png" alt="Feedback" height="30px" width="30px">
+                <h2 class="text-xl font-bold mb-2 text-center">Tutor’s Feedback</h2>
+            </div>
+            <divc class="flex flex-col justify-center items-center gap-4 mb-4">
+                <p> - QIARA Azqiara Shanum Quinna selalu hadir di setiap sesi pelajaran 
+                    dan menunjukkan antusiasme yang tinggi. Kami sangat menghargai 
+                    kehadirannya yang konsisten, ini adalah langkah penting dalam 
+                    proses belajarnya. Terus semangat, ya!</p>
+                <p>- QIARA Azqiara Shanum Quinna sangat terlibat dalam setiap sesi, 
+                    aktif berpartisipasi dalam diskusi, dan tidak ragu mengajukan 
+                    pertanyaan yang mendalam. QIARA Azqiara Shanum Quinna selalu 
+                    menunjukkan kemajuan yang baik dan memahami materi dengan 
+                    cepat. Saya sering memberikan tantangan tambahan untuk 
+                    membantu QIARA Azqiara Shanum Quinna terus berkembang dan 
+                    belajar lebih jauh.</p>
+                <p>- QIARA Azqiara Shanum Quinna telah berhasil menyelesaikan 
+                    semua tugas dengan sangat baik. Pemahamannya terhadap materi 
+                    sangat jelas, dan QIARA Azqiara Shanum Quinna mampu 
+                    menyelesaikan setiap tugas tepat waktu. Senang sekali melihat 
+                    kemajuannya yang terus meningkat. Terus lanjutkan usaha ini, ya!</p>
+                <p>- QIARA Azqiara Shanum Quinna tampaknya punya disiplin yang 
+                    tinggi dan potensi yang besar dalam bidang Python Start_2_IND</p>           
+            </div>
+        </div>
+
+        <div>
+            <p>Laporan dibuat oleh: Azhar Faturohman Ahidin</p>
+        </div>
+        
+    </div>
+
+    
+</body>
+</html>
