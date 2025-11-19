@@ -1,4 +1,5 @@
-from rest_framework import viewsets
+from rest_framework import viewsets, permissions
+from rest_framework.decorators import api_view, permission_classes
 from feedbacks.models import Feedback
 from feedbacks.serializers import FeedbackSerializer
 from rest_framework.throttling import UserRateThrottle, AnonRateThrottle
@@ -20,15 +21,6 @@ class FeedbackViewSet(viewsets.ModelViewSet):
         AnonRateThrottle,
     ]
 
-    def list(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset())
-        for feedback in queryset:
-            print(feedback.group.lessons.filter(title__icontains='Python'))
-            for student in feedback.group.students.all():
-                print(student.phone_number)
-
-        return super().list(request, *args, **kwargs)
-
     # def perform_create(self, serializer):
     #     feedback = serializer.save()
     #     phone_numbers = []
@@ -46,17 +38,13 @@ class FeedbackViewSet(viewsets.ModelViewSet):
     #     create_schedule(data)
 
 
-
-class FeedbackDownloadPDFView(LoginRequiredMixin, PermissionRequiredMixin, View):
-    raise_exception = False
-    permission_required = 'feedbacks.view_feedback'
-    queryset = Feedback.objects.select_related("group").all()
-
-    def get(self, request, *args, **kwargs):
-        html = render_to_string('index.html', {
-            'data': "Aku",
-        })
-        pdf = HTML(string=html).write_pdf()
-        response = HttpResponse(pdf, content_type='application/pdf')
-        response['Content-Disposition'] = f'attachment; filename="Feedbacks.pdf"'
-        return response
+@api_view(['GET'])
+@permission_classes([permissions.IsAuthenticated])
+def generate_feedback_pdf(request, group_id=None):
+    html = render_to_string('index.html', {
+        'data': "Aku",
+    })
+    pdf = HTML(string=html).write_pdf()
+    response = HttpResponse(pdf, content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="Feedbacks.pdf"'
+    return response
