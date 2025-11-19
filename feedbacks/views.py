@@ -41,7 +41,7 @@ class FeedbackViewSet(viewsets.ModelViewSet):
 @api_view(['GET'])
 @permission_classes([permissions.IsAuthenticated])
 def generate_feedback_pdf(request, group_id=None):
-    html = render_to_string('index.html', {
+    html = render_to_string('index2.html', {
         'data': "Aku",
     })
     pdf = HTML(string=html).write_pdf()
