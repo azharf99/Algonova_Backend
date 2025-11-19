@@ -19,10 +19,12 @@ from django.urls import include, path
 from django.conf import settings
 from django.conf.urls.static import static
 from rest_framework import routers
+from rest_framework_simplejwt.views import TokenRefreshView
 from feedbacks.views import FeedbackViewSet
 from groups.views import GroupViewSet
 from lessons.views import LessonViewSet
 from students.views import StudentViewSet
+from utils.token import MyTokenObtainPairView, exchange_token
 
 router = routers.DefaultRouter()
 router.register(r'students', StudentViewSet)
@@ -34,6 +36,9 @@ router.register(r'feedbacks', FeedbackViewSet)
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include(router.urls)),
+    path('api/token/', MyTokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('api/auth/exchange-token/', exchange_token, name='token_exchange'),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework'))
 ]
 

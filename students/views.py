@@ -21,7 +21,7 @@ class StudentViewSet(viewsets.ModelViewSet):
         AnonRateThrottle,
     ]
 
-    @action(detail=False, methods=['post'], parser_classes=[MultiPartParser], url_path='import')
+    @action(detail=False, methods=['post'], parser_classes=[MultiPartParser], url_path='import', url_name='Import Students from CSV')
     def import_csv(self, request, *args, **kwargs):
         file_obj = request.data.get('file')
 

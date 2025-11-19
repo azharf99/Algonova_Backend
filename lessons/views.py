@@ -21,6 +21,11 @@ class LessonViewSet(viewsets.ModelViewSet):
         AnonRateThrottle,
     ]
 
+    def update(self, request, *args, **kwargs):
+        data = request.data
+        print(data.get('students_attended'))
+        return super().update(request, *args, **kwargs)
+
     @action(detail=False, methods=['post'], parser_classes=[MultiPartParser], url_path='import')
     def import_csv(self, request, *args, **kwargs):
         file_obj = request.data.get('file')
