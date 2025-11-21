@@ -52,14 +52,9 @@
             font-weight: 600;
         }
 
-        .last_section{
-            margin-bottom: 5px;
-        }
-
         .big_font{
             font-size: 1.5rem;
             text-align: center;
-            margin: 2px;
         }
         
         .star_container{
@@ -145,7 +140,8 @@
 </head>
 <body>
     <div class="header">
-        <img src="{{ base_url }}/images/header.png" height="auto" width="100%" alt="Header Image">
+        <!-- <img src="{{ base_url }}/images/header.png" alt="Header Image"> -->
+        <img src="header.png" width="100%" height="auto" alt="Header Image">
     </div>
 
     <div class="container">
@@ -162,8 +158,8 @@
             </div>
             <hr class="line">
             <div class="sub_section_wrapper">
-                <div class="sub_section_title last_section">Lama Pelatihan:</div>
-                <div class="last_section">Bulan ke-{{student_month_course}}</div>
+                <div class="sub_section_title">Lama Pelatihan:</div>
+                <div>Bulan ke-{{student_month_course}}</div>
             </div>
         </div>
         <div class="informasi">
@@ -227,7 +223,8 @@
         </div>
         <div class="border path_container">
             <p class="section_title">Jalur Pendidikan</p>
-            <img src="{{ base_url }}/images/path.png" alt="Path" width="300px" height="auto">
+            <!-- <img src="{{ base_url }}/images/path.png" alt="Path" width="300px" height="auto"> -->
+            <img src="path.png" alt="Path" width="100%" height="auto">
             <p class="description"> Informasi lebih lanjut dapat diakses melalui link berikut :</p>
             <div class="section_with_icon">
                 <span class="icon">&#128073;</span>
@@ -247,7 +244,7 @@
         </div>
 
         <div>
-            <p class="description">Laporan dibuat oleh: Azhar Faturohman Ahidin</p>
+            <p>Laporan dibuat oleh: Azhar Faturohman Ahidin</p>
         </div>
         
     </div>

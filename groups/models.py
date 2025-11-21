@@ -25,6 +25,7 @@ class Group(models.Model):
     
 
     class Meta:
+        ordering = ['name']
         verbose_name = "Group"
         verbose_name_plural = "Groups"
         indexes = [

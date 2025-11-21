@@ -1,3 +1,5 @@
+import os
+from django.conf import settings
 from rest_framework import viewsets, permissions
 from rest_framework.decorators import api_view, permission_classes
 from feedbacks.models import Feedback
@@ -7,9 +9,14 @@ from utils.pagination import StandardResultsSetPagination
 from django.views import View
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.template.loader import render_to_string
-from django.http import HttpResponse, HttpResponseRedirect
-from weasyprint import HTML
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
+from weasyprint import HTML, CSS
 from utils.whatsapp import create_schedule
+from dotenv import load_dotenv
+load_dotenv()
+from .tasks import generate_pdf_async
+from django.http import JsonResponse
+from celery.result import AsyncResult
 # Create your views here.
 
 class FeedbackViewSet(viewsets.ModelViewSet):
@@ -37,14 +44,44 @@ class FeedbackViewSet(viewsets.ModelViewSet):
     #     }
     #     create_schedule(data)
 
+    # celery -A Algonova_Backend worker -l info -P eventlet
+
 
 @api_view(['GET'])
 @permission_classes([permissions.IsAuthenticated])
-def generate_feedback_pdf(request, group_id=None):
-    html = render_to_string('index2.html', {
-        'data': "Aku",
+def generate_feedback_pdf(request):
+    task = generate_pdf_async.delay(
+        {
+            "student_name": "Azhar",
+            "student_month_course": "Azhar",
+            "student_class": "Azhar",
+            "student_level": "Azhar",
+            "student_project_link": "Azhar",
+            "student_referal_link": 'https://algonova.id/invite?utm_source=refferal&utm_medium=employee&utm_campaign=social_network&utm_content=hidin466" target="_blank',
+            "student_module_link": "https://drive.google.com/drive/u/0/folders/1lErW_RKjHOkAgqCr9yymELg3yUZzvBEb",
+            "module_topic": "Azhar",
+            "module_result": "Azhar",
+            "skill_result": "Azhar",
+            "teacher_feedback": ["Azhar", "Azhar", "Azhar", "Azhar"],
+        }, 
+        "index.html",
+    )
+
+    return JsonResponse({
+        "task_id": task.id,
+        "status": "processing"
     })
-    pdf = HTML(string=html).write_pdf()
-    response = HttpResponse(pdf, content_type='application/pdf')
-    response['Content-Disposition'] = f'attachment; filename="Feedbacks.pdf"'
-    return response
+
+
+
+
+def pdf_status(request, task_id):
+    result = AsyncResult(task_id)
+
+    if result.ready():
+        return JsonResponse({
+            "status": "finished",
+            "file": result.get()
+        })
+    else:
+        return JsonResponse({"status": "processing"})

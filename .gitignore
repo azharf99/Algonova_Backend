@@ -11,3 +11,5 @@ staticfiles/
 .idea/
 .vscode/
 *.log
+node_modules/
+*.json

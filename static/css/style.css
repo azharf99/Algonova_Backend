@@ -1,0 +1,128 @@
+:root{
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: xx-small;
+    box-sizing: border-box;
+    margin: 10px;
+}
+
+.header{
+    margin-bottom: 10px;
+}
+
+.header img{
+    border-radius: 10px;
+}
+
+.container{
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+}
+
+.section_title{
+    font-weight: 600;
+    font-size: 12px;
+    text-align: center;
+    margin: 3px 0 3px 0;
+}
+
+.sub_section_wrapper{
+    display: grid;
+    grid-template-columns: 0.4fr 1fr;
+    gap: 4px;
+    justify-content: center;
+    align-items: center;
+}
+
+.sub_section_title{
+    font-weight: 600;
+}
+
+.last_section{
+    margin-bottom: 5px;
+}
+
+.big_font{
+    font-size: 1.5rem;
+    text-align: center;
+    margin: 2px;
+}
+
+.star_container{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+.stars{
+    font-size: 1.5rem;
+    background-color: #E8EAED;
+    padding: 5px;
+    border-radius: 5px;
+    margin: 0;
+}
+
+.section_with_icon{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 2px;
+}
+
+.text-center{
+    text-align: center;
+}
+
+.topic_title{
+    display: flex;
+    justify-content: start;
+    align-items: center;
+}
+
+.informasi{
+    background-color: #D9D2E9;
+    color: #3F1F75;
+    padding: 0 5px;
+}
+
+.link_container{
+    background-color: #FFF2CC;
+    min-height: fit-content;
+    text-align: center;
+    padding-bottom: 5px;
+}
+
+.path_container{
+    background-color: #F8F8EB;
+    text-align: center;
+}
+
+.border{
+    border: 2px solid #9900FF;
+    min-height: fit-content;
+    padding: 5px;
+}
+
+.line{
+    border: 1px solid #5B88EF;
+}
+
+.description{
+    margin: 4px 0 4px 0;
+    
+}
+
+p a{
+    text-decoration: none;
+    padding: 2px 5px;
+    font-weight: 600;
+    border-radius: 5px;
+    color: white;
+    background-color: #5B88EF;
+}
+
+.icon{
+    color: #3F1F75;
+    font-weight: 500;
+}
