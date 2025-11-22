@@ -61,6 +61,8 @@ class GroupViewSet(viewsets.ModelViewSet):
                             'group_phone': row.get('group_phone'),
                             'meeting_link': row.get('meeting_link'),
                             'recordings_link': row.get('recordings_link'),
+                            'first_lesson_date': row.get('first_lesson_date'),
+                            'first_lesson_time': row.get('first_lesson_time'),
                             'is_active': True if row.get('is_active', 'True').lower() == 'true' else False,
                         }
                     )
