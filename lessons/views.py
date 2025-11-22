@@ -58,28 +58,33 @@ class LessonViewSet(viewsets.ModelViewSet):
                     groups_qs = Group.objects.prefetch_related('students').filter(id__in=group_ids)
 
                     for group in groups_qs:
-                        shift_days = int(row.get('number'))-1
-                        lesson, created = Lesson.objects.update_or_create(
-                            id=id,
-                            defaults={
-                                'title': row.get('title'),
-                                'category': row.get('category'),
-                                'module': row.get('module'),
-                                'level': row.get('level'),
-                                'number': row.get('number'),
-                                'group': group,
-                                'description': row.get('description'),
-                                'meeting_link': group.meeting_link,
-                                'date_start': group.first_lesson_date + timedelta(days=7*shift_days) if group.first_lesson_date else row.get('date_start'),
-                                'time_start': group.first_lesson_time,
-                                'is_active': True if row.get('is_active', 'True').lower() == 'true' else False,
-                            }
-                        )
+                        try:
+                            shift_days = int(row.get('number'))-1
+                            lesson, created = Lesson.objects.update_or_create(
+                                id=id,
+                                defaults={
+                                    'title': row.get('title'),
+                                    'category': row.get('category'),
+                                    'module': row.get('module'),
+                                    'level': row.get('level'),
+                                    'number': row.get('number'),
+                                    'group': group,
+                                    'description': row.get('description'),
+                                    'meeting_link': group.meeting_link,
+                                    'date_start': group.first_lesson_date + timedelta(days=7*shift_days) if group.first_lesson_date else row.get('date_start'),
+                                    'time_start': group.first_lesson_time,
+                                    'is_active': True if row.get('is_active', 'True').lower() == 'true' else False,
+                                }
+                            )
 
-                        if created:
-                            created_count += 1
-                        else:
-                            updated_count += 1
+                            if created:
+                                created_count += 1
+                            else:
+                                updated_count += 1
+                                
+                        except:
+                            errors.append({"row": row, "error": f"{row.get('number')} cannot convert to number in 'number' field."})
+
 
         except Exception as e:
             return Response({"detail": f"An error occurred during import: {str(e)}"}, status=status.HTTP_400_BAD_REQUEST)
