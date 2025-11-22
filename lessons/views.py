@@ -57,7 +57,8 @@ class LessonViewSet(viewsets.ModelViewSet):
                     group_ids = map(int, group_id.split(", "))
                     groups_qs = Group.objects.prefetch_related('students').filter(id__in=group_ids)
 
-                    for group in groups_qs:              
+                    for group in groups_qs:
+                        shift_days = int(row.get('number'))-1
                         lesson, created = Lesson.objects.update_or_create(
                             id=id,
                             defaults={
@@ -69,7 +70,7 @@ class LessonViewSet(viewsets.ModelViewSet):
                                 'group': group,
                                 'description': row.get('description'),
                                 'meeting_link': group.meeting_link,
-                                'date_start': group.first_lesson_date + timedelta(days=7) if group.first_lesson_date else row.get('date_start'),
+                                'date_start': group.first_lesson_date + timedelta(days=7*shift_days) if group.first_lesson_date else row.get('date_start'),
                                 'time_start': group.first_lesson_time,
                                 'is_active': True if row.get('is_active', 'True').lower() == 'true' else False,
                             }
