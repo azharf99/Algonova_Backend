@@ -38,7 +38,7 @@ class GroupViewSet(viewsets.ModelViewSet):
             groups_data = request.data
 
         if not isinstance(groups_data, list):
-            return Response({"detail": "Invalid data format. Expected a list of student objects."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"detail": "Invalid data format. Expected a list of group objects."}, status=status.HTTP_400_BAD_REQUEST)
         
         created_count = 0
         updated_count = 0
