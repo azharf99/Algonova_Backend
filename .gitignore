@@ -13,3 +13,4 @@ staticfiles/
 *.log
 node_modules/
 *.json
+data/

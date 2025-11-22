@@ -6,7 +6,7 @@ from students.models import Student
 # Create your models here.
 class Lesson(models.Model):
     title = models.CharField(max_length=100)
-    category = models.CharField(max_length=50, blank=True, null=True)
+    category = models.CharField(max_length=100, blank=True, null=True)
     module = models.CharField(max_length=50)
     level = models.CharField(max_length=50)
     number = models.PositiveIntegerField()
@@ -14,6 +14,7 @@ class Lesson(models.Model):
     description = models.TextField(blank=True, null=True)
     date_start = models.DateField(default=timezone.now)
     time_start = models.TimeField(default=timezone.now)
+    meeting_link = models.URLField(blank=True, null=True)
     students_attended = models.ManyToManyField(Student, related_name='attended_lessons', blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

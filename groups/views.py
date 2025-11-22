@@ -1,5 +1,6 @@
 import csv
 import io
+import json
 from django.db import transaction
 from django.shortcuts import render
 from rest_framework import viewsets, status
@@ -22,33 +23,40 @@ class GroupViewSet(viewsets.ModelViewSet):
         AnonRateThrottle,
     ]
 
-
-    @action(detail=False, methods=['post'], parser_classes=[MultiPartParser], url_path='import')
+    @action(detail=False, methods=['post'], url_path='import', url_name='Import Groups from CSV')
     def import_csv(self, request, *args, **kwargs):
-        file_obj = request.data.get('file')
+        groups_data = request.data.get('file')
 
-        if not file_obj:
-            return Response({"detail": "No file provided."}, status=status.HTTP_400_BAD_REQUEST)
-        if not file_obj.name.endswith('.csv'):
-            return Response({"detail": "File must be a CSV."}, status=status.HTTP_400_BAD_REQUEST)
+        # If data is sent as a JSON string in FormData, parse it.
+        if isinstance(groups_data, str):
+            try:
+                groups_data = json.loads(groups_data)
+            except json.JSONDecodeError:
+                return Response({"detail": "Invalid JSON format in 'file' field."}, status=status.HTTP_400_BAD_REQUEST)
+        # If data is sent as raw JSON, request.data will already be a list.
+        elif isinstance(request.data, list):
+            groups_data = request.data
 
+        if not isinstance(groups_data, list):
+            return Response({"detail": "Invalid data format. Expected a list of student objects."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        created_count = 0
+        updated_count = 0
+        errors = []
+        
         try:
-            decoded_file = file_obj.read().decode('utf-8')
-            io_string = io.StringIO(decoded_file)
-            reader = csv.DictReader(io_string)
-
             with transaction.atomic():
-                for row in reader:
+                for row in groups_data:
                     id = row.get('id')
                     if not id:
-                        continue # Skip rows without a ID
-
+                        errors.append({"row": row, "error": "Missing 'id' field."})
+                        continue  # Skip rows without an ID
+                    
                     group, created = Group.objects.update_or_create(
                         id=id,
                         defaults={
-                            'name': row.get('name'),
+                            'name': row.get('group_name'),
                             'description': row.get('description'),
-                            'students': row.get('students'),
                             'type': row.get('type'),
                             'group_phone': row.get('group_phone'),
                             'meeting_link': row.get('meeting_link'),
@@ -58,14 +66,23 @@ class GroupViewSet(viewsets.ModelViewSet):
                     )
 
                     # Handle Many-to-Many for teachers
-                    students_ids = row.get('students_ids', '')
+                    students_ids = row.get('students', '')
                     if students_ids:
-                        students_ids = [int(id.strip()) for id in students_ids.split(',') if id.strip().isdigit()]
-                        teachers = Student.objects.filter(id__in=students_ids)
-                        group.students.set(teachers)
+                        students_ids = [int(id.strip()) for id in students_ids.split(', ') if id.strip().isdigit()]
+                        students = Student.objects.filter(id__in=students_ids)
+                        group.students.set(students)
+
+                    if created:
+                        created_count += 1
+                    else:
+                        updated_count += 1
 
         except Exception as e:
             return Response({"detail": f"An error occurred during import: {str(e)}"}, status=status.HTTP_400_BAD_REQUEST)
 
-        return Response({"detail": "Students imported successfully."}, status=status.HTTP_201_CREATED)
-
+        return Response({
+            "detail": "Import process finished.",
+            "created": created_count,
+            "updated": updated_count,
+            "errors": errors
+        }, status=status.HTTP_200_OK)

@@ -1,5 +1,6 @@
 import csv
 import io
+import json
 from django.db import transaction
 from django.shortcuts import render
 from rest_framework import viewsets, status
@@ -21,26 +22,35 @@ class StudentViewSet(viewsets.ModelViewSet):
         AnonRateThrottle,
     ]
 
-    @action(detail=False, methods=['post'], parser_classes=[MultiPartParser], url_path='import', url_name='Import Students from CSV')
+    @action(detail=False, methods=['post'], url_path='import', url_name='Import Students from CSV')
     def import_csv(self, request, *args, **kwargs):
-        file_obj = request.data.get('file')
+        students_data = request.data.get('file')
 
-        if not file_obj:
-            return Response({"detail": "No file provided."}, status=status.HTTP_400_BAD_REQUEST)
-        if not file_obj.name.endswith('.csv'):
-            return Response({"detail": "File must be a CSV."}, status=status.HTTP_400_BAD_REQUEST)
+        # If data is sent as a JSON string in FormData, parse it.
+        if isinstance(students_data, str):
+            try:
+                students_data = json.loads(students_data)
+            except json.JSONDecodeError:
+                return Response({"detail": "Invalid JSON format in 'file' field."}, status=status.HTTP_400_BAD_REQUEST)
+        # If data is sent as raw JSON, request.data will already be a list.
+        elif isinstance(request.data, list):
+            students_data = request.data
 
+        if not isinstance(students_data, list):
+            return Response({"detail": "Invalid data format. Expected a list of student objects."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        created_count = 0
+        updated_count = 0
+        errors = []
+        
         try:
-            decoded_file = file_obj.read().decode('utf-8')
-            io_string = io.StringIO(decoded_file)
-            reader = csv.DictReader(io_string)
-
             with transaction.atomic():
-                for row in reader:
+                for row in students_data:
                     id = row.get('id')
                     if not id:
-                        continue # Skip rows without a ID
-
+                        errors.append({"row": row, "error": "Missing 'id' field."})
+                        continue  # Skip rows without an ID
+                    
                     student, created = Student.objects.update_or_create(
                         id=id,
                         defaults={
@@ -54,8 +64,17 @@ class StudentViewSet(viewsets.ModelViewSet):
                             'is_active': True if row.get('is_active', 'True').lower() == 'true' else False,
                         }
                     )
+                    if created:
+                        created_count += 1
+                    else:
+                        updated_count += 1
 
         except Exception as e:
             return Response({"detail": f"An error occurred during import: {str(e)}"}, status=status.HTTP_400_BAD_REQUEST)
 
-        return Response({"detail": "Students imported successfully."}, status=status.HTTP_201_CREATED)
+        return Response({
+            "detail": "Import process finished.",
+            "created": created_count,
+            "updated": updated_count,
+            "errors": errors
+        }, status=status.HTTP_200_OK)
