@@ -51,47 +51,69 @@ class LessonViewSet(viewsets.ModelViewSet):
         try:
             with transaction.atomic():
                 for row in lessons_data:
-                    group_id = row.get('group_id')
-                    if not group_id:
-                        errors.append({"row": row, "error": "Missing 'id' or 'group_id' field."})
-                        continue  # Skip rows without an Group ID
-                    group_ids = map(int, group_id.split(", "))
-                    groups_qs = Group.objects.prefetch_related('students').filter(id__in=group_ids)
+                    lesson, created = Lesson.objects.update_or_create(
+                        id=row.get('id'),
+                        group_id=row.get('group_id'),
+                        defaults=dict(
+                            title=row.get('title'),
+                            category=row.get('category'),
+                            number=row.get('number'),
+                            module= row.get('module'),
+                            level= row.get('level'),
+                            description= row.get('description'),
+                            meeting_link= row.get('meeting_link'),
+                            date_start=datetime.strptime(row.get('date_start'), '%Y-%m-%d').date(),
+                            time_start=row.get('time_start'),
+                            is_active= True if row.get('is_active', 'True').lower() == 'true' else False,
+                        )
+                    )
+                    if created:
+                        created_count += 1
+                    else:
+                        updated_count += 1
 
-                    for group in groups_qs:
-                        try:
-                            shift_days = int(row.get('number'))-1
-                            lesson, created = Lesson.objects.update_or_create(
-                                title=row.get('title'),
-                                category=row.get('category'),
-                                group=group,
-                                number=row.get('number'),
-                                defaults={
-                                    'module': row.get('module'),
-                                    'level': row.get('level'),
-                                    'description': row.get('description'),
-                                    'meeting_link': row.get('meeting_link', group.meeting_link),
-                                    'date_start': row.get('date_start', group.first_lesson_date + timedelta(days=7*shift_days) if group.first_lesson_date else datetime.now().date()),
-                                    'time_start': row.get('date_start', group.first_lesson_time if group.first_lesson_time else datetime.now().time()),
-                                    'is_active': True if row.get('is_active', 'True').lower() == 'true' else False,
-                                }
-                            )
+                    # group_id = row.get('group_id')
+                    # date_start = row.get('date_start')
+                    # if not group_id or not date_start:
+                    #     errors.append({"row": row, "error": "Missing 'id' or 'group_id' field."})
+                    #     continue  # Skip rows without an Group ID
+                    # group_ids = map(int, group_id.split(", "))
+                    # groups_qs = Group.objects.prefetch_related('students').filter(id__in=group_ids)
 
-                            # Handle Many-to-Many for teachers
-                            students_ids = row.get('students_attended', '')
-                            if students_ids:
-                                students_ids = [int(id.strip()) for id in students_ids.split(', ') if id.strip().isdigit()]
-                                students = Student.objects.filter(id__in=students_ids)
-                                lesson.students.set(students)
+                    # for group in groups_qs:
+                    #     try:
+                    #         shift_days = row.get('number')-1
+                    #         lesson, created = Lesson.objects.update_or_create(
+                    #             title=row.get('title'),
+                    #             category=row.get('category'),
+                    #             group=group,
+                    #             number=row.get('number'),
+                    #             defaults={
+                    #                 'module': row.get('module'),
+                    #                 'level': row.get('level'),
+                    #                 'description': row.get('description'),
+                    #                 'meeting_link': row.get('meeting_link', group.meeting_link),
+                    #                 'date_start': row.get('date_start', group.first_lesson_date + timedelta(days=7*shift_days) if group.first_lesson_date else datetime.now().date()),
+                    #                 'time_start': row.get('date_start', group.first_lesson_time if group.first_lesson_time else datetime.now().time()),
+                    #                 'is_active': True if row.get('is_active', 'True').lower() == 'true' else False,
+                    #             }
+                    #         )
 
-                            if created:
-                                created_count += 1
-                            else:
-                                updated_count += 1
-                                # print("Updated lesson:", lesson)
-                                
-                        except:
-                            errors.append({"row": row, "error": f"{row.get('number')} cannot convert to number in 'number' field."})
+                    #         # Handle Many-to-Many for teachers
+                    #         students_ids = row.get('students_attended', '')
+                    #         if students_ids:
+                    #             students_ids = [int(id.strip()) for id in students_ids.split(', ') if id.strip().isdigit()]
+                    #             students = Student.objects.filter(id__in=students_ids)
+                    #             lesson.students.set(students)
+
+                    #         if created:
+                    #             created_count += 1
+                    #         else:
+                    #             updated_count += 1
+                    #             # print("Updated lesson:", lesson)
+                             
+                    #     except:
+                    #         errors.append({"row": row, "error": f"{row.get('number')} cannot convert to number in 'number' field."})
 
 
         except Exception as e:
@@ -120,7 +142,7 @@ class LessonViewSet(viewsets.ModelViewSet):
             'module', 
             'level', 
             'number', 
-            'group', 
+            'group_id', 
             'description', 
             'date_start', 
             'time_start', 
@@ -143,7 +165,7 @@ class LessonViewSet(viewsets.ModelViewSet):
                 lesson.module,
                 lesson.level,
                 lesson.number,
-                lesson.group,
+                lesson.group.id,
                 lesson.description,
                 lesson.date_start,
                 lesson.time_start,

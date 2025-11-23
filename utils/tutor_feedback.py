@@ -1,15 +1,35 @@
-def get_feedback(student_name, attendance_number):
-    if attendance_number == 0:
-        return f"{student_name} tidak hadir di seluruh sesi pelajaran bulan ini. Kami ingin membantu agar {student_name} bisa kembali mengikuti pelajaran dengan lebih baik. Kami akan menghubungi Anda untuk membahas solusi yang tepat."
-    elif attendance_number == 1:
-        return f"{student_name} hadir hanya di 1 dari 4 sesi pelajaran bulan ini. Kami khawatir ini bisa mempengaruhi pemahaman materi yang diajarkan. Jika memungkinkan, mari kita diskusikan bagaimana agar {student_name} bisa lebih rutin mengikuti pelajaran."
-    elif attendance_number == 2:
-        return f"{student_name} hanya hadir di 2 dari 4 sesi bulan ini. Kami melihat kehadiran yang tidak konsisten mulai mempengaruhi kemajuan belajar. Akan lebih baik jika {student_name} bisa hadir lebih teratur agar tidak tertinggal materi."
-    elif attendance_number == 3:
-        return f"{student_name} mengikuti 3 dari 4 sesi pelajaran bulan ini. Kehadirannya cukup baik, dan meskipun ada satu sesi yang terlewat, {student_name} tetap mengikuti materi dengan baik. Kami yakin kehadiran yang lebih konsisten akan membuat belajarnya lebih maksimal!"
-    elif attendance_number == 4:
-        return f"{student_name} selalu hadir di setiap sesi pelajaran dan menunjukkan antusiasme yang tinggi. Kami sangat menghargai kehadirannya yang konsisten, ini adalah langkah penting dalam proses belajarnya. Terus semangat, ya!."
+def get_feedback(student_name, attendance_score, activity_score, task_score):
+    feedbacks = []
+    if attendance_score == 0:
+        feedbacks.append(f"{student_name} tidak hadir di seluruh sesi pelajaran bulan ini. Kami ingin membantu agar {student_name} bisa kembali mengikuti pelajaran dengan lebih baik. Kami akan menghubungi Anda untuk membahas solusi yang tepat.")
+    elif attendance_score == 1:
+        feedbacks.append(f"{student_name} hadir hanya di 1 dari 4 sesi pelajaran bulan ini. Kami khawatir ini bisa mempengaruhi pemahaman materi yang diajarkan. Jika memungkinkan, mari kita diskusikan bagaimana agar {student_name} bisa lebih rutin mengikuti pelajaran.")
+    elif attendance_score == 2:
+        feedbacks.append(f"{student_name} hanya hadir di 2 dari 4 sesi bulan ini. Kami melihat kehadiran yang tidak konsisten mulai mempengaruhi kemajuan belajar. Akan lebih baik jika {student_name} bisa hadir lebih teratur agar tidak tertinggal materi.")
+    elif attendance_score == 3:
+        feedbacks.append(f"{student_name} mengikuti 3 dari 4 sesi pelajaran bulan ini. Kehadirannya cukup baik, dan meskipun ada satu sesi yang terlewat, {student_name} tetap mengikuti materi dengan baik. Kami yakin kehadiran yang lebih konsisten akan membuat belajarnya lebih maksimal!")
+    elif attendance_score == 4:
+        feedbacks.append(f"{student_name} selalu hadir di setiap sesi pelajaran dan menunjukkan antusiasme yang tinggi. Kami sangat menghargai kehadirannya yang konsisten, ini adalah langkah penting dalam proses belajarnya. Terus semangat, ya!")
     
+
+    if activity_score == 0:
+        feedbacks.append("Syafiq Alwan Kahar tampak mengalami kesulitan dalam mengikuti pelajaran terakhir. Kurangnya fokus menyebabkan Syafiq Alwan Kahar tidak sepenuhnya menangkap materi. Kami menyarankan agar Syafiq Alwan Kahar lebih terlibat aktif dalam kelas agar pemahaman terhadap pelajaran meningkat. Jika Anda memerlukan bantuan atau rekaman kelas, kami siap memberikan dukungan tambahan.")
+    elif activity_score == 1:
+        feedbacks.append("Syafiq Alwan Kahar cenderung lebih diam di kelas dan jarang terlibat dalam diskusi. Kami menyarankan agar Syafiq Alwan Kahar lebih terbuka untuk bertanya atau berinteraksi sehingga bisa lebih mudah memahami materi. Jika ada kendala tertentu, kami siap membantu agar suasana kelas lebih nyaman untuk belajar.")
+    elif activity_score == 2:
+        feedbacks.append("Syafiq Alwan Kahar cukup fokus di kelas meskipun jarang bertanya. Namun, Syafiq Alwan Kahar selalu memperhatikan dengan baik dan mengikuti instruksi dengan seksama. Mungkin dengan lebih banyak berpartisipasi dalam diskusi, Syafiq Alwan Kahar bisa meningkatkan pemahaman materi. Secara keseluruhan, Syafiq Alwan Kahar sudah menunjukkan perkembangan yang positif.")
+    elif activity_score == 3:
+        feedbacks.append("Syafiq Alwan Kahar sangat terlibat dalam setiap sesi, aktif berpartisipasi dalam diskusi, dan tidak ragu mengajukan pertanyaan yang mendalam. Syafiq Alwan Kahar selalu menunjukkan kemajuan yang baik dan memahami materi dengan cepat. Saya sering memberikan tantangan tambahan untuk membantu Syafiq Alwan Kahar terus berkembang dan belajar lebih jauh.")
+
+    if task_score == 0:
+        feedbacks.append("Syafiq Alwan Kahar tampaknya menghadapi beberapa tantangan dalam menyelesaikan tugas kali ini. Sangat penting bagi Syafiq Alwan Kahar untuk meluangkan lebih banyak waktu dalam berlatih agar pemahamannya terhadap materi semakin kuat. Kami berharap Syafiq Alwan Kahar bisa mengejar ketinggalan. Jika ada kesulitan, jangan ragu untuk menghubungi saya, saya siap membantu.")
+    elif task_score == 1:
+        feedbacks.append("Syafiq Alwan Kahar berhasil menyelesaikan sebagian besar tugas dengan baik, namun ada beberapa area yang memerlukan sedikit perbaikan. Dengan latihan tambahan dan perhatian lebih, Syafiq Alwan Kahar pasti akan bisa meningkatkan kualitas tugas-tugasnya dan mencapai hasil yang lebih baik lagi.")
+    elif task_score == 2:
+        feedbacks.append("Syafiq Alwan Kahar telah berhasil menyelesaikan semua tugas dengan sangat baik. Pemahamannya terhadap materi sangat jelas, dan Syafiq Alwan Kahar mampu menyelesaikan setiap tugas tepat waktu. Senang sekali melihat kemajuannya yang terus meningkat. Terus lanjutkan usaha ini, ya!")
+
+    return feedbacks
+
 
 
 def get_tutor_feedback(student_name):

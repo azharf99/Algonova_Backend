@@ -8,6 +8,7 @@ from feedbacks.models import Feedback
 from feedbacks.serializers import FeedbackSerializer
 from rest_framework.throttling import UserRateThrottle, AnonRateThrottle
 from lessons.models import Lesson
+from utils.level import get_course_level
 from utils.pagination import StandardResultsSetPagination
 from django.views import View
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
@@ -15,7 +16,7 @@ from django.template.loader import render_to_string
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from weasyprint import HTML, CSS
 from utils.topic import get_competency, get_result, get_topic
-from utils.tutor_feedback import get_tutor_feedback
+from utils.tutor_feedback import get_feedback, get_tutor_feedback
 from utils.whatsapp import create_schedule
 from dotenv import load_dotenv
 load_dotenv()
@@ -33,28 +34,43 @@ class FeedbackViewSet(viewsets.ModelViewSet):
         AnonRateThrottle,
     ]
 
-    def list(self, request, *args, **kwargs):
-        lessons = Lesson.objects.prefetch_related('group__students', 'students_attended').select_related('group').filter(is_active=True)
-        for lesson in lessons:
-            # Create monthly feedback
-            if lesson.number % 4 == 0:
-                for student in lesson.group.students.all():
-                    feedback, is_created = Feedback.objects.select_related('group').prefetch_related('group__students').update_or_create(
-                        group = lesson.group,
-                        number = lesson.number // 4,
-                        defaults={
-                            'topic': get_topic(lesson.module, lesson.number // 4),
-                            'result': get_result(lesson.module, lesson.number // 4),
-                            'competency': get_competency(lesson.module, lesson.number // 4),
-                            'tutor_feedback': get_tutor_feedback(student.fullname),
-                            'lesson_date': lesson.date_start,
-                            'lesson_time': lesson.time_start,
-                            'is_sent': False,
-                        }
+    # def list(self, request, *args, **kwargs):
+    #     lessons = Lesson.objects.prefetch_related('group__students', 'students_attended').select_related('group').filter(is_active=True)
+    #     updated_count = 0
+    #     created_count = 0
+    #     counter = 1
+    #     for lesson in lessons:
+    #         # Create monthly feedback
+    #         if lesson.level == "M1L1":
+    #             counter = 1
+    #         if counter % 4 == 0:
+    #             for student in lesson.group.students.all():
+    #                 feedback, is_created = Feedback.objects.select_related('student').update_or_create(
+    #                     student = student,
+    #                     number = counter // 4,
+    #                     defaults={
+    #                         'topic': get_topic(lesson.module, counter // 4),
+    #                         'result': get_result(lesson.module, counter // 4),
+    #                         'competency': get_competency(lesson.module, counter // 4),
+    #                         'tutor_feedback': get_tutor_feedback(student.fullname),
+    #                         'lesson_date': lesson.date_start,
+    #                         'lesson_time': lesson.time_start,
+    #                         'is_sent': False,
+    #                         'level' : get_course_level(lesson.module),
+    #                         'course' : lesson.module,
+    #                         'project_link' : lesson.group.recordings_link,
+    #                     }
+    #                 )
+                    
+    #                 if is_created:
+    #                     created_count += 1
+    #                 else:
+    #                     updated_count += 1
+    #         counter += 1
 
-                    )
+    #     print(f"Created feedbacks: {created_count}, Updated feedbacks: {updated_count}")
 
-        return super().list(request, *args, **kwargs)
+    #     return super().list(request, *args, **kwargs)
 
     # def perform_create(self, serializer):
     #     feedback = serializer.save()
@@ -80,36 +96,34 @@ def generate_feedback_pdf(request):
 
     base_url = Path(settings.BASE_DIR, "static").resolve().as_uri()
     # Render HTML
-    queryset = Feedback.objects.select_related('group').prefetch_related('group__students').filter(is_sent=False)
-    html_string = render_to_string("index.html",
-        {
-            "student_name": "Azhar",
-            "student_month_course": "Azhar",
-            "student_class": "Azhar",
-            "student_level": "Azhar",
-            "student_project_link": "Azhar",
-            "student_referal_link": 'https://algonova.id/invite?utm_source=refferal&utm_medium=employee&utm_campaign=social_network&utm_content=hidin466" target="_blank',
-            "student_module_link": "https://drive.google.com/drive/u/0/folders/1lErW_RKjHOkAgqCr9yymELg3yUZzvBEb",
-            "module_topic": "Azhar",
-            "module_result": "Azhar",
-            "skill_result": "Azhar",
-            "teacher_feedback": ["Azhar", "Azhar", "Azhar", "Azhar"],
-        }
-    )
+    queryset = Feedback.objects.select_related('student').filter(is_sent=False)
+    for feedback in queryset:
+        html_string = render_to_string("index.html",
+            {
+                "student_name": feedback.student.fullname,
+                "student_month_course": feedback.number,
+                "student_class": feedback.course,
+                "student_level": feedback.level,
+                "student_project_link": feedback.project_link,
+                "student_referal_link": 'https://algonova.id/invite?utm_source=refferal&utm_medium=employee&utm_campaign=social_network&utm_content=hidin466" target="_blank',
+                "student_module_link": "https://drive.google.com/drive/u/0/folders/1lErW_RKjHOkAgqCr9yymELg3yUZzvBEb",
+                "module_topic": feedback.topic,
+                "module_result": feedback.result,
+                "skill_result": feedback.competency,
+                "teacher_feedback": get_feedback(feedback.student.fullname, feedback.attendance_score, feedback.activity_score, feedback.task_score),
+            }
+        )
 
-    pdf = HTML(string=html_string, base_url=base_url).write_pdf()
+        pdf = HTML(string=html_string, base_url=base_url).write_pdf()
 
-    filename = f"report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf"
-    save_path = Path(settings.MEDIA_ROOT) / filename
+        filename = f"{feedback.student.groups.first().name}/Rapor {feedback.student.fullname} Bulan ke-{feedback.number}.pdf"
+        save_path = Path(settings.MEDIA_ROOT) / filename
 
-    with open(save_path, "wb") as f:
-        f.write(pdf)
-
-    return settings.MEDIA_URL + filename
+        with open(save_path, "wb") as f:
+            f.write(pdf)
 
     return JsonResponse({
-        "task_id": task.id,
-        "status": "processing"
+        "Pdf has been generated!"
     })
 
 
