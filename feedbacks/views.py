@@ -1,10 +1,13 @@
+from datetime import datetime
 import os
+from pathlib import Path
 from django.conf import settings
 from rest_framework import viewsets, permissions
 from rest_framework.decorators import api_view, permission_classes
 from feedbacks.models import Feedback
 from feedbacks.serializers import FeedbackSerializer
 from rest_framework.throttling import UserRateThrottle, AnonRateThrottle
+from groups.models import Group
 from utils.pagination import StandardResultsSetPagination
 from django.views import View
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
@@ -28,6 +31,19 @@ class FeedbackViewSet(viewsets.ModelViewSet):
         AnonRateThrottle,
     ]
 
+    def list(self, request, *args, **kwargs):
+        lessons = lessons.objects.filter(is_active=True)
+        for lesson in lessons:
+            # Create monthly feedback
+            if int(lesson.number) % 4 == 0:
+                feedback, is_created = Feedback.objects.select_related('group').prefetch_related('group__students').update_or_create(
+                    group = lesson.group,
+                    number = int(lesson.number) // 4,
+
+                )
+
+        return super().list(request, *args, **kwargs)
+
     # def perform_create(self, serializer):
     #     feedback = serializer.save()
     #     phone_numbers = []
@@ -46,11 +62,13 @@ class FeedbackViewSet(viewsets.ModelViewSet):
 
     # celery -A Algonova_Backend worker -l info -P eventlet
 
-
 @api_view(['GET'])
 @permission_classes([permissions.IsAuthenticated])
 def generate_feedback_pdf(request):
-    task = generate_pdf_async.delay(
+
+    base_url = Path(settings.BASE_DIR, "static").resolve().as_uri()
+    # Render HTML
+    html_string = render_to_string("index.html",
         {
             "student_name": "Azhar",
             "student_month_course": "Azhar",
@@ -63,9 +81,18 @@ def generate_feedback_pdf(request):
             "module_result": "Azhar",
             "skill_result": "Azhar",
             "teacher_feedback": ["Azhar", "Azhar", "Azhar", "Azhar"],
-        }, 
-        "index.html",
+        }
     )
+
+    pdf = HTML(string=html_string, base_url=base_url).write_pdf()
+
+    filename = f"report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf"
+    save_path = Path(settings.MEDIA_ROOT) / filename
+
+    with open(save_path, "wb") as f:
+        f.write(pdf)
+
+    return settings.MEDIA_URL + filename
 
     return JsonResponse({
         "task_id": task.id,
@@ -74,14 +101,41 @@ def generate_feedback_pdf(request):
 
 
 
+# @api_view(['GET'])
+# @permission_classes([permissions.IsAuthenticated])
+# def generate_feedback_pdf(request):
+#     task = generate_pdf_async.delay(
+        # {
+        #     "student_name": "Azhar",
+        #     "student_month_course": "Azhar",
+        #     "student_class": "Azhar",
+        #     "student_level": "Azhar",
+        #     "student_project_link": "Azhar",
+        #     "student_referal_link": 'https://algonova.id/invite?utm_source=refferal&utm_medium=employee&utm_campaign=social_network&utm_content=hidin466" target="_blank',
+        #     "student_module_link": "https://drive.google.com/drive/u/0/folders/1lErW_RKjHOkAgqCr9yymELg3yUZzvBEb",
+        #     "module_topic": "Azhar",
+        #     "module_result": "Azhar",
+        #     "skill_result": "Azhar",
+        #     "teacher_feedback": ["Azhar", "Azhar", "Azhar", "Azhar"],
+        # }, 
+#         "index.html",
+#     )
 
-def pdf_status(request, task_id):
-    result = AsyncResult(task_id)
+#     return JsonResponse({
+#         "task_id": task.id,
+#         "status": "processing"
+#     })
 
-    if result.ready():
-        return JsonResponse({
-            "status": "finished",
-            "file": result.get()
-        })
-    else:
-        return JsonResponse({"status": "processing"})
+
+
+
+# def pdf_status(request, task_id):
+#     result = AsyncResult(task_id)
+
+#     if result.ready():
+#         return JsonResponse({
+#             "status": "finished",
+#             "file": result.get()
+#         })
+#     else:
+#         return JsonResponse({"status": "processing"})
