@@ -21,11 +21,11 @@ class Lesson(models.Model):
     is_active = models.BooleanField(default=True)
 
     def __str__(self):
-        return f"{self.title} - {self.module} - {self.level}"
+        return f"{self.title} - {self.module} - {self.level} - {self.group}"
     
 
     class Meta:
-        ordering = ['number']
+        ordering = ['number', 'group__name']
         verbose_name = "Lesson"
         verbose_name_plural = "Lessons"
         indexes = [

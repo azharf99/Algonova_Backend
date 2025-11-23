@@ -1,4 +1,5 @@
 import csv
+from datetime import datetime
 import io
 import json
 from django.db import transaction
@@ -61,7 +62,7 @@ class GroupViewSet(viewsets.ModelViewSet):
                             'group_phone': row.get('group_phone'),
                             'meeting_link': row.get('meeting_link'),
                             'recordings_link': row.get('recordings_link'),
-                            'first_lesson_date': row.get('first_lesson_date'),
+                            'first_lesson_date': datetime.strptime(row.get('first_lesson_date'), '%d/%m/%Y').date(),
                             'first_lesson_time': row.get('first_lesson_time'),
                             'is_active': True if row.get('is_active', 'True').lower() == 'true' else False,
                         }
