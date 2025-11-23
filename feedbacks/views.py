@@ -80,6 +80,7 @@ def generate_feedback_pdf(request):
 
     base_url = Path(settings.BASE_DIR, "static").resolve().as_uri()
     # Render HTML
+    queryset = Feedback.objects.select_related('group').prefetch_related('group__students').filter(is_sent=False)
     html_string = render_to_string("index.html",
         {
             "student_name": "Azhar",
