@@ -7,13 +7,15 @@ from rest_framework.decorators import api_view, permission_classes
 from feedbacks.models import Feedback
 from feedbacks.serializers import FeedbackSerializer
 from rest_framework.throttling import UserRateThrottle, AnonRateThrottle
-from groups.models import Group
+from lessons.models import Lesson
 from utils.pagination import StandardResultsSetPagination
 from django.views import View
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.template.loader import render_to_string
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from weasyprint import HTML, CSS
+from utils.topic import get_competency, get_result, get_topic
+from utils.tutor_feedback import get_tutor_feedback
 from utils.whatsapp import create_schedule
 from dotenv import load_dotenv
 load_dotenv()
@@ -32,15 +34,25 @@ class FeedbackViewSet(viewsets.ModelViewSet):
     ]
 
     def list(self, request, *args, **kwargs):
-        lessons = lessons.objects.filter(is_active=True)
+        lessons = Lesson.objects.prefetch_related('group__students', 'students_attended').select_related('group').filter(is_active=True)
         for lesson in lessons:
             # Create monthly feedback
-            if int(lesson.number) % 4 == 0:
-                feedback, is_created = Feedback.objects.select_related('group').prefetch_related('group__students').update_or_create(
-                    group = lesson.group,
-                    number = int(lesson.number) // 4,
+            if lesson.number % 4 == 0:
+                for student in lesson.group.students.all():
+                    feedback, is_created = Feedback.objects.select_related('group').prefetch_related('group__students').update_or_create(
+                        group = lesson.group,
+                        number = lesson.number // 4,
+                        defaults={
+                            'topic': get_topic(lesson.module, lesson.number // 4),
+                            'result': get_result(lesson.module, lesson.number // 4),
+                            'competency': get_competency(lesson.module, lesson.number // 4),
+                            'tutor_feedback': get_tutor_feedback(student.fullname),
+                            'lesson_date': lesson.date_start,
+                            'lesson_time': lesson.time_start,
+                            'is_sent': False,
+                        }
 
-                )
+                    )
 
         return super().list(request, *args, **kwargs)
 

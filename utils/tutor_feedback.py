@@ -12,7 +12,7 @@ def get_feedback(student_name, attendance_number):
     
 
 
-def get_teacher_message(student_name):
+def get_tutor_feedback(student_name):
     return f"""Halo, Ayah/Bunda dari {student_name}! 👋
 
 Saya Azhar Faturohman Ahidin, tutor {student_name} di Sekolah Pemrograman Internasional Algonova.
