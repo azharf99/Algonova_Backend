@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
+from datetime import timedelta
 from pathlib import Path
 from dotenv import load_dotenv
 import os
@@ -159,6 +160,14 @@ REST_FRAMEWORK = {
         'anon': '100/day',
         'user': '1000/day'
     },
+}
+
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),  # Token akses berlaku 60 menit
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),    # Token refresh berlaku 1 hari
+    'ROTATE_REFRESH_TOKENS': True,                  # Refresh token baru setiap refresh
+    'BLACKLIST_AFTER_ROTATION': True,               # Blacklist token lama
 }
 
 

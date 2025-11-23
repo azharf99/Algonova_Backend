@@ -5,7 +5,7 @@ import json
 from django.db import transaction
 from django.http import HttpResponse
 from django.shortcuts import render
-from rest_framework import viewsets, status
+from rest_framework import viewsets, status, permissions
 from groups.models import Group
 from lessons.models import Lesson
 from lessons.serializers import LessonSerializer
@@ -14,7 +14,7 @@ from students.models import Student
 from utils.pagination import StandardResultsSetPagination
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser
-from rest_framework.decorators import action
+from rest_framework.decorators import action, permission_classes
 # Create your views here.
 
 class LessonViewSet(viewsets.ModelViewSet):
@@ -26,7 +26,7 @@ class LessonViewSet(viewsets.ModelViewSet):
         AnonRateThrottle,
     ]
 
-
+    @permission_classes(permissions.IsAuthenticated)
     @action(detail=False, methods=['post'], url_path='import', url_name='Import Lessons from CSV')
     def import_csv(self, request, *args, **kwargs):
         lessons_data = request.data.get('file')
@@ -88,7 +88,7 @@ class LessonViewSet(viewsets.ModelViewSet):
                                 created_count += 1
                             else:
                                 updated_count += 1
-                                print("Updated lesson:", lesson)
+                                # print("Updated lesson:", lesson)
                                 
                         except:
                             errors.append({"row": row, "error": f"{row.get('number')} cannot convert to number in 'number' field."})
@@ -105,7 +105,8 @@ class LessonViewSet(viewsets.ModelViewSet):
         }, status=status.HTTP_200_OK)
     
 
-    @action(detail=False, methods=['get'])
+    @permission_classes(permissions.IsAuthenticated)
+    @action(detail=False, methods=['get'], url_path='export', url_name='Export Lessons to CSV')
     def export(self, request, *args, **kwargs):
         response = HttpResponse(content_type='text/csv')
         response['Content-Disposition'] = 'attachment; filename="lessons.csv"'

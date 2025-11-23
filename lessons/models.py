@@ -25,7 +25,7 @@ class Lesson(models.Model):
     
 
     class Meta:
-        ordering = ['number', 'group__name']
+        ordering = ['group__name', 'number']
         verbose_name = "Lesson"
         verbose_name_plural = "Lessons"
         indexes = [
