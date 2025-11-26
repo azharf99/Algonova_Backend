@@ -1,8 +1,10 @@
 from __future__ import absolute_import, unicode_literals
 import os
-from django.conf import settings
+from dotenv import load_dotenv
+load_dotenv()
 
-if settings.DEBUG:
+
+if os.getenv("DEBUG").lower() == "true":
     from celery import Celery
 
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'Algonova_Backend.settings')

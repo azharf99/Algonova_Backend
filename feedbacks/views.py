@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 import os
 from pathlib import Path
 from django.conf import settings
@@ -8,6 +8,7 @@ from feedbacks.models import Feedback
 from feedbacks.serializers import FeedbackSerializer
 from rest_framework.throttling import UserRateThrottle, AnonRateThrottle
 from lessons.models import Lesson
+from utils.fedback_seeder import feedback_seeder
 from utils.level import get_course_level
 from utils.pagination import StandardResultsSetPagination
 from django.views import View
@@ -31,44 +32,6 @@ class FeedbackViewSet(viewsets.ModelViewSet):
         AnonRateThrottle,
     ]
 
-    # def list(self, request, *args, **kwargs):
-    #     lessons = Lesson.objects.prefetch_related('group__students', 'students_attended').select_related('group').filter(is_active=True)
-    #     updated_count = 0
-    #     created_count = 0
-    #     counter = 1
-    #     for lesson in lessons:
-    #         # Create monthly feedback
-    #         if lesson.level == "M1L1":
-    #             counter = 1
-    #         if counter % 4 == 0:
-    #             for student in lesson.group.students.all():
-    #                 feedback, is_created = Feedback.objects.select_related('student').update_or_create(
-    #                     student = student,
-    #                     number = counter // 4,
-    #                     defaults={
-    #                         'topic': get_topic(lesson.module, counter // 4),
-    #                         'result': get_result(lesson.module, counter // 4),
-    #                         'competency': get_competency(lesson.module, counter // 4),
-    #                         'tutor_feedback': get_tutor_feedback(student.fullname),
-    #                         'lesson_date': lesson.date_start,
-    #                         'lesson_time': lesson.time_start,
-    #                         'is_sent': False,
-    #                         'level' : get_course_level(lesson.module),
-    #                         'course' : lesson.module,
-    #                         'project_link' : lesson.group.recordings_link,
-    #                     }
-    #                 )
-                    
-    #                 if is_created:
-    #                     created_count += 1
-    #                 else:
-    #                     updated_count += 1
-    #         counter += 1
-
-    #     print(f"Created feedbacks: {created_count}, Updated feedbacks: {updated_count}")
-
-    #     return super().list(request, *args, **kwargs)
-
 
 # celery -A Algonova_Backend worker -l info -P eventlet
 # celery -A Algonova_Backend purge
@@ -76,42 +39,6 @@ class FeedbackViewSet(viewsets.ModelViewSet):
 if settings.DEBUG:
     from celery.result import AsyncResult
     from .tasks import generate_pdf_async
-
-    @api_view(['GET'])
-    @permission_classes([permissions.IsAuthenticated])
-    def generate_feedback_pdf(request):
-
-        base_url = Path(settings.BASE_DIR, "static").resolve().as_uri()
-        # Render HTML
-        queryset = Feedback.objects.select_related('student').filter(is_sent=False)
-        for feedback in queryset:
-            html_string = render_to_string("index.html",
-                {
-                    "student_name": feedback.student.fullname,
-                    "student_month_course": feedback.number,
-                    "student_class": feedback.course,
-                    "student_level": feedback.level,
-                    "student_project_link": feedback.project_link,
-                    "student_referal_link": 'https://algonova.id/invite?utm_source=refferal&utm_medium=employee&utm_campaign=social_network&utm_content=hidin466" target="_blank',
-                    "student_module_link": "https://drive.google.com/drive/u/0/folders/1lErW_RKjHOkAgqCr9yymELg3yUZzvBEb",
-                    "module_topic": feedback.topic,
-                    "module_result": feedback.result,
-                    "skill_result": feedback.competency,
-                    "teacher_feedback": get_feedback(feedback.student.fullname, feedback.attendance_score, feedback.activity_score, feedback.task_score),
-                }
-            )
-
-            pdf = HTML(string=html_string, base_url=base_url).write_pdf()
-
-            filename = f"{feedback.student.groups.first().name}/Rapor {feedback.student.fullname} Bulan ke-{feedback.number}.pdf"
-            save_path = Path(settings.MEDIA_ROOT) / filename
-
-            with open(save_path, "wb") as f:
-                f.write(pdf)
-
-        return JsonResponse({
-            "Pdf has been generated!"
-        })
 
 
     def pdf_status(request, task_id):
@@ -126,40 +53,43 @@ if settings.DEBUG:
             return JsonResponse({"status": "processing"})
 
 
+    @api_view(['GET'])
+    @permission_classes([permissions.IsAuthenticated])
+    def generate_feedback_pdf(request):
+        student_id = request.GET.get('student_id')
+        number = request.GET.get('number')
+        if number:
+            number = map(int, number.split(","))
+        response = []
+        if student_id and number:
+            queryset = Feedback.objects.select_related('student').filter(is_sent=False, student_id=student_id, number__in=number)
+        elif student_id:
+            queryset = Feedback.objects.select_related('student').filter(is_sent=False, student_id=student_id)
+        else:
+            queryset = Feedback.objects.select_related('student').filter(is_sent=False)
+        for feedback in queryset:
+            task = generate_pdf_async.delay({
+                "student_name": feedback.student.fullname,
+                "student_month_course": feedback.number,
+                "student_class": feedback.course,
+                "student_level": feedback.level,
+                "student_project_link": feedback.project_link,
+                "student_referal_link": 'https://algonova.id/invite?utm_source=refferal&utm_medium=employee&utm_campaign=social_network&utm_content=hidin466" target="_blank',
+                "student_module_link": "https://drive.google.com/drive/u/0/folders/1lErW_RKjHOkAgqCr9yymELg3yUZzvBEb",
+                "module_topic": feedback.topic,
+                "module_result": feedback.result,
+                "skill_result": feedback.competency,
+                "teacher_feedback": get_feedback(feedback.student.fullname, int(feedback.attendance_score), int(feedback.activity_score), int(feedback.task_score)),
+                },
+                "index.html",
+                f"{feedback.student.groups.first().name}/Rapor {feedback.student.fullname} Bulan ke-{feedback.number}.pdf"
+            )
+            response.append({
+                "task_id": task.id,
+                "status": "processing"
+            })
 
-
-@api_view(['GET'])
-@permission_classes([permissions.IsAuthenticated])
-def generate_feedback_pdf(request):
-    student_id = request.GET.get('student_id')
-    if student_id:
-        queryset = Feedback.objects.select_related('student').filter(is_sent=False, student_id=student_id)
-    else:
-        queryset = Feedback.objects.select_related('student').filter(is_sent=False)
-    response = []
-    for feedback in queryset:
-        task = generate_pdf_async.delay({
-            "student_name": feedback.student.fullname,
-            "student_month_course": feedback.number,
-            "student_class": feedback.course,
-            "student_level": feedback.level,
-            "student_project_link": feedback.project_link,
-            "student_referal_link": 'https://algonova.id/invite?utm_source=refferal&utm_medium=employee&utm_campaign=social_network&utm_content=hidin466" target="_blank',
-            "student_module_link": "https://drive.google.com/drive/u/0/folders/1lErW_RKjHOkAgqCr9yymELg3yUZzvBEb",
-            "module_topic": feedback.topic,
-            "module_result": feedback.result,
-            "skill_result": feedback.competency,
-            "teacher_feedback": get_feedback(feedback.student.fullname, int(feedback.attendance_score), int(feedback.activity_score), int(feedback.task_score)),
-            },
-            "index.html",
-            f"{feedback.student.groups.first().name}/Rapor {feedback.student.fullname} Bulan ke-{feedback.number}.pdf"
-        )
-        response.append({
-            "task_id": task.id,
-            "status": "processing"
-        })
-
-    return JsonResponse(response, safe=False)
+        return JsonResponse(response, safe=False)
 
 
 
@@ -174,14 +104,15 @@ def send_feedback_pdf(request):
     data_list = []
     for feedback in queryset:
         group_phone = feedback.student.groups.first().group_phone
+        current_time = timedelta(hours=queryset.lesson_time.hour, minutes=queryset.lesson_time.minute, seconds=queryset.lesson_time.second)
+
         if group_phone is not None:
             data = {
+                'type': 'document',
                 'phone': student_phone,
-                'date': feedback.lesson_date,
-                'time': feedback.lesson_time,
-                'timezone': 'Asia/Jakarta',
-                'message': feedback.tutor_feedback,
-                'isGroup': 'true',
+                'scheduled_at': f"{feedback.lesson_date} {current_time+timedelta(hours=2)}",
+                'text': feedback.tutor_feedback,
+                'url' : ''
             }
             data_list.append(data)
             continue
@@ -189,23 +120,19 @@ def send_feedback_pdf(request):
         student_phone = feedback.student.phone_number
         if student_phone is not None:
             data = {
+                'type': 'text',
                 'phone': student_phone,
-                'date': feedback.lesson_date,
-                'time': feedback.lesson_time,
-                'timezone': 'Asia/Jakarta',
-                'message': feedback.tutor_feedback,
-                'isGroup': 'false',
+                'scheduled_at': f"{feedback.lesson_date} {current_time+timedelta(hours=2)}",
+                'text': feedback.tutor_feedback,
             }
             data_list.append(data)
         data = {
-            'phone': '6281218xxxxxx',
+            'type': 'text',
             'phone': feedback.student.parent_contact,
-            'date': feedback.lesson_date,
-            'time': feedback.lesson_time,
-            'timezone': 'Asia/Jakarta',
-            'message': feedback.tutor_feedback,
-            'isGroup': 'false',
+            'scheduled_at': f"{feedback.lesson_date} {current_time+timedelta(hours=2)}",
+            'text': feedback.tutor_feedback,
         }
+        data_list.append(data)
         response = create_schedule(data_list)
 
     return JsonResponse(response)
