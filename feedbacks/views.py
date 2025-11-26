@@ -19,7 +19,6 @@ from utils.tutor_feedback import get_feedback, get_tutor_feedback
 from utils.whatsapp import create_schedule
 from dotenv import load_dotenv
 load_dotenv()
-from .tasks import generate_pdf_async
 from django.http import JsonResponse
 # Create your views here.
 
@@ -76,6 +75,7 @@ class FeedbackViewSet(viewsets.ModelViewSet):
 
 if settings.DEBUG:
     from celery.result import AsyncResult
+    from .tasks import generate_pdf_async
 
     @api_view(['GET'])
     @permission_classes([permissions.IsAuthenticated])
