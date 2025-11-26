@@ -1,9 +1,12 @@
 from __future__ import absolute_import, unicode_literals
 import os
-from celery import Celery
+from django.conf import settings
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'Algonova_Backend.settings')
+if settings.DEBUG:
+    from celery import Celery
 
-app = Celery('Algonova_Backend')
-app.config_from_object('django.conf:settings', namespace='CELERY')
-app.autodiscover_tasks()
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'Algonova_Backend.settings')
+
+    app = Celery('Algonova_Backend')
+    app.config_from_object('django.conf:settings', namespace='CELERY')
+    app.autodiscover_tasks()

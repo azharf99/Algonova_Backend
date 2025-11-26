@@ -20,7 +20,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from rest_framework import routers
 from rest_framework_simplejwt.views import TokenRefreshView
-from feedbacks.views import FeedbackViewSet, generate_feedback_pdf, generate_student_feedback_pdf, pdf_status, send_feedback_pdf
+from feedbacks.views import FeedbackViewSet, generate_feedback_pdf, pdf_status, send_feedback_pdf
 from groups.views import GroupViewSet
 from lessons.views import LessonViewSet
 from students.views import StudentViewSet
@@ -45,6 +45,11 @@ urlpatterns = [
     path('feedback/send/', send_feedback_pdf, name='feedback_send'),
 ]
 
+if settings.DEBUG:
+    urlpatterns += [
+        path('feedback/download/', generate_feedback_pdf, name='feedback_download'),
+        path('feedback/download/<str:task_id>/', pdf_status, name='feedback_download_status'),
+    ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
