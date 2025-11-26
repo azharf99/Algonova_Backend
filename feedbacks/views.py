@@ -89,80 +89,139 @@ class FeedbackViewSet(viewsets.ModelViewSet):
     #     create_schedule(data)
 
     # celery -A Algonova_Backend worker -l info -P eventlet
-
-@api_view(['GET'])
-@permission_classes([permissions.IsAuthenticated])
-def generate_feedback_pdf(request):
-
-    base_url = Path(settings.BASE_DIR, "static").resolve().as_uri()
-    # Render HTML
-    queryset = Feedback.objects.select_related('student').filter(is_sent=False)
-    for feedback in queryset:
-        html_string = render_to_string("index.html",
-            {
-                "student_name": feedback.student.fullname,
-                "student_month_course": feedback.number,
-                "student_class": feedback.course,
-                "student_level": feedback.level,
-                "student_project_link": feedback.project_link,
-                "student_referal_link": 'https://algonova.id/invite?utm_source=refferal&utm_medium=employee&utm_campaign=social_network&utm_content=hidin466" target="_blank',
-                "student_module_link": "https://drive.google.com/drive/u/0/folders/1lErW_RKjHOkAgqCr9yymELg3yUZzvBEb",
-                "module_topic": feedback.topic,
-                "module_result": feedback.result,
-                "skill_result": feedback.competency,
-                "teacher_feedback": get_feedback(feedback.student.fullname, feedback.attendance_score, feedback.activity_score, feedback.task_score),
-            }
-        )
-
-        pdf = HTML(string=html_string, base_url=base_url).write_pdf()
-
-        filename = f"{feedback.student.groups.first().name}/Rapor {feedback.student.fullname} Bulan ke-{feedback.number}.pdf"
-        save_path = Path(settings.MEDIA_ROOT) / filename
-
-        with open(save_path, "wb") as f:
-            f.write(pdf)
-
-    return JsonResponse({
-        "Pdf has been generated!"
-    })
-
+    # celery -A Algonova_Backend purge
 
 
 # @api_view(['GET'])
 # @permission_classes([permissions.IsAuthenticated])
 # def generate_feedback_pdf(request):
-#     task = generate_pdf_async.delay(
-        # {
-        #     "student_name": "Azhar",
-        #     "student_month_course": "Azhar",
-        #     "student_class": "Azhar",
-        #     "student_level": "Azhar",
-        #     "student_project_link": "Azhar",
-        #     "student_referal_link": 'https://algonova.id/invite?utm_source=refferal&utm_medium=employee&utm_campaign=social_network&utm_content=hidin466" target="_blank',
-        #     "student_module_link": "https://drive.google.com/drive/u/0/folders/1lErW_RKjHOkAgqCr9yymELg3yUZzvBEb",
-        #     "module_topic": "Azhar",
-        #     "module_result": "Azhar",
-        #     "skill_result": "Azhar",
-        #     "teacher_feedback": ["Azhar", "Azhar", "Azhar", "Azhar"],
-        # }, 
-#         "index.html",
-#     )
+
+#     base_url = Path(settings.BASE_DIR, "static").resolve().as_uri()
+#     # Render HTML
+#     queryset = Feedback.objects.select_related('student').filter(is_sent=False)
+#     for feedback in queryset:
+#         html_string = render_to_string("index.html",
+#             {
+#                 "student_name": feedback.student.fullname,
+#                 "student_month_course": feedback.number,
+#                 "student_class": feedback.course,
+#                 "student_level": feedback.level,
+#                 "student_project_link": feedback.project_link,
+#                 "student_referal_link": 'https://algonova.id/invite?utm_source=refferal&utm_medium=employee&utm_campaign=social_network&utm_content=hidin466" target="_blank',
+#                 "student_module_link": "https://drive.google.com/drive/u/0/folders/1lErW_RKjHOkAgqCr9yymELg3yUZzvBEb",
+#                 "module_topic": feedback.topic,
+#                 "module_result": feedback.result,
+#                 "skill_result": feedback.competency,
+#                 "teacher_feedback": get_feedback(feedback.student.fullname, feedback.attendance_score, feedback.activity_score, feedback.task_score),
+#             }
+#         )
+
+#         pdf = HTML(string=html_string, base_url=base_url).write_pdf()
+
+#         filename = f"{feedback.student.groups.first().name}/Rapor {feedback.student.fullname} Bulan ke-{feedback.number}.pdf"
+#         save_path = Path(settings.MEDIA_ROOT) / filename
+
+#         with open(save_path, "wb") as f:
+#             f.write(pdf)
 
 #     return JsonResponse({
-#         "task_id": task.id,
-#         "status": "processing"
+#         "Pdf has been generated!"
 #     })
 
 
 
+@api_view(['GET'])
+@permission_classes([permissions.IsAuthenticated])
+def generate_feedback_pdf(request):
+    student_id = request.GET.get('student_id')
+    if student_id:
+        queryset = Feedback.objects.select_related('student').filter(is_sent=False, student_id=student_id)
+    else:
+        queryset = Feedback.objects.select_related('student').filter(is_sent=False)
+    response = []
+    for feedback in queryset:
+        task = generate_pdf_async.delay({
+            "student_name": feedback.student.fullname,
+            "student_month_course": feedback.number,
+            "student_class": feedback.course,
+            "student_level": feedback.level,
+            "student_project_link": feedback.project_link,
+            "student_referal_link": 'https://algonova.id/invite?utm_source=refferal&utm_medium=employee&utm_campaign=social_network&utm_content=hidin466" target="_blank',
+            "student_module_link": "https://drive.google.com/drive/u/0/folders/1lErW_RKjHOkAgqCr9yymELg3yUZzvBEb",
+            "module_topic": feedback.topic,
+            "module_result": feedback.result,
+            "skill_result": feedback.competency,
+            "teacher_feedback": get_feedback(feedback.student.fullname, int(feedback.attendance_score), int(feedback.activity_score), int(feedback.task_score)),
+            },
+            "index.html",
+            f"{feedback.student.groups.first().name}/Rapor {feedback.student.fullname} Bulan ke-{feedback.number}.pdf"
+        )
+        response.append({
+            "task_id": task.id,
+            "status": "processing"
+        })
 
-# def pdf_status(request, task_id):
-#     result = AsyncResult(task_id)
+    return JsonResponse(response, safe=False)
 
-#     if result.ready():
-#         return JsonResponse({
-#             "status": "finished",
-#             "file": result.get()
-#         })
-#     else:
-#         return JsonResponse({"status": "processing"})
+
+
+@api_view(['GET'])
+@permission_classes([permissions.IsAuthenticated])
+def send_feedback_pdf(request):
+    student_id = request.GET.get('student_id')
+    if student_id:
+        queryset = Feedback.objects.select_related('student').filter(is_sent=False, student_id=student_id)
+    else:
+        queryset = Feedback.objects.select_related('student').filter(is_sent=False)
+    data_list = []
+    for feedback in queryset:
+        group_phone = feedback.student.groups.first().group_phone
+        if group_phone is not None:
+            data = {
+                'phone': student_phone,
+                'date': feedback.lesson_date,
+                'time': feedback.lesson_time,
+                'timezone': 'Asia/Jakarta',
+                'message': feedback.tutor_feedback,
+                'isGroup': 'true',
+            }
+            data_list.append(data)
+            continue
+
+        student_phone = feedback.student.phone_number
+        if student_phone is not None:
+            data = {
+                'phone': student_phone,
+                'date': feedback.lesson_date,
+                'time': feedback.lesson_time,
+                'timezone': 'Asia/Jakarta',
+                'message': feedback.tutor_feedback,
+                'isGroup': 'false',
+            }
+            data_list.append(data)
+        data = {
+            'phone': '6281218xxxxxx',
+            'phone': feedback.student.parent_contact,
+            'date': feedback.lesson_date,
+            'time': feedback.lesson_time,
+            'timezone': 'Asia/Jakarta',
+            'message': feedback.tutor_feedback,
+            'isGroup': 'false',
+        }
+        response = create_schedule(data_list)
+
+    return JsonResponse(response)
+
+
+
+
+def pdf_status(request, task_id):
+    result = AsyncResult(task_id)
+
+    if result.ready():
+        return JsonResponse({
+            "status": "finished",
+            "file": result.get()
+        })
+    else:
+        return JsonResponse({"status": "processing"})

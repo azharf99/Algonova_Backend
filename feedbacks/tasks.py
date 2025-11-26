@@ -8,7 +8,7 @@ from weasyprint import HTML, CSS
 from datetime import datetime
 
 @shared_task
-def generate_pdf_async(context_data, template_name):
+def generate_pdf_async(context_data, template_name, filename):
 
     base_url = Path(settings.BASE_DIR, "static").resolve().as_uri()
     # Render HTML
@@ -19,7 +19,6 @@ def generate_pdf_async(context_data, template_name):
 
     pdf = HTML(string=html_string, base_url=base_url).write_pdf()
 
-    filename = f"report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf"
     save_path = Path(settings.MEDIA_ROOT) / filename
 
     with open(save_path, "wb") as f:

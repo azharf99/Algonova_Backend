@@ -13,9 +13,11 @@ def create_schedule(data):
         "Authorization": f"{token}.{secret_key}"
     }
 
-    requests.post(
+    response = requests.post(
         url,
         data=data,
         headers=headers,
         verify=False
     )
+
+    return response.json()
