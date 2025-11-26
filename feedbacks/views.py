@@ -2,8 +2,9 @@ from datetime import datetime, timedelta
 import os
 from pathlib import Path
 from django.conf import settings
-from rest_framework import viewsets, permissions
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework import viewsets, permissions, status
+from rest_framework.decorators import api_view, permission_classes, action
+from rest_framework.response import Response
 from feedbacks.models import Feedback
 from feedbacks.serializers import FeedbackSerializer
 from rest_framework.throttling import UserRateThrottle, AnonRateThrottle
@@ -31,6 +32,29 @@ class FeedbackViewSet(viewsets.ModelViewSet):
         UserRateThrottle,
         AnonRateThrottle,
     ]
+
+
+    @permission_classes(permissions.IsAuthenticated)
+    @action(detail=False, methods=['get'], url_path='generate', url_name='Generate Feedbacks')
+    def generate_feedback(self, request, *args, **kwargs):
+        group_id = request.GET.get("group_id")
+        if group_id:
+            is_success = feedback_seeder(Lesson, Feedback, True, group_id)
+        else:
+            is_success = feedback_seeder(Lesson, Feedback, False, all=False) #disable sementara
+        if is_success:
+            return Response({
+                "detail": "Import process finished.",
+                "group_id": group_id
+            }, status=status.HTTP_200_OK)
+        else:
+            return Response({
+                "detail": "Import failed or disable temporary!.",
+                "group_id": group_id
+            }, status=status.HTTP_200_OK)
+
+
+
 
 
 # celery -A Algonova_Backend worker -l info -P eventlet

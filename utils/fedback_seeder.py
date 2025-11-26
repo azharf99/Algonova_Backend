@@ -3,8 +3,13 @@ from utils.topic import get_competency, get_result, get_topic
 from utils.tutor_feedback import get_tutor_feedback
 
 
-def feedback_seeder(Lesson, Feedback):
-    lessons = Lesson.objects.prefetch_related('group__students', 'students_attended').select_related('group').filter(is_active=True)
+def feedback_seeder(Lesson, Feedback, group=False, group_id=None, all=False):
+    if group and group_id:
+        lessons = Lesson.objects.prefetch_related('group__students', 'students_attended').select_related('group').filter(is_active=True, group_id=group_id)
+    elif not group and all:
+        lessons = Lesson.objects.prefetch_related('group__students', 'students_attended').select_related('group').filter(is_active=True)
+    else:
+        return False
     updated_count = 0
     created_count = 0
     counter = 1
@@ -38,3 +43,4 @@ def feedback_seeder(Lesson, Feedback):
         counter += 1
 
     print(f"Created feedbacks: {created_count}, Updated feedbacks: {updated_count}")
+    return True
