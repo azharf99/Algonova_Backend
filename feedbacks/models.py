@@ -23,12 +23,13 @@ class Feedback(models.Model):
     lesson_date = models.DateField(default=timezone.now)
     lesson_time = models.TimeField(default=timezone.now)
     is_sent = models.BooleanField(default=False)
+    schedule_id = models.CharField(max_length=150, blank=True, null=True)
     url_pdf = models.URLField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
     def __str__(self):
-        return f"Feedback {self.student.fullname} ke-{self.number}"
+        return f"Rapor {self.student.fullname} Bulan ke-{self.number} {self.course}"
     
     
     class Meta:

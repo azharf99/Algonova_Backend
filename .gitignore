@@ -14,3 +14,4 @@ staticfiles/
 node_modules/
 *.json
 data/
+test.py

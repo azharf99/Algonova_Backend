@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'lessons',
     'feedbacks',
     'rest_framework',
+    'django_filters',
     'corsheaders',
     'rest_framework_simplejwt',
 ]
@@ -160,6 +161,7 @@ REST_FRAMEWORK = {
         'anon': '100/day',
         'user': '1000/day'
     },
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
 }
 
 
