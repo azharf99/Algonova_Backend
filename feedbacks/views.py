@@ -33,6 +33,14 @@ class FeedbackViewSet(viewsets.ModelViewSet):
         AnonRateThrottle,
     ]
 
+    def list(self, request, *args, **kwargs):
+        feedbacks = Feedback.objects.all()
+        for feedback in feedbacks:
+            feedback.group_name = feedback.student.groups.first().name
+            feedback.save()
+
+        return super().list(request, *args, **kwargs)
+
 
     @permission_classes(permissions.IsAuthenticated)
     @action(detail=False, methods=['get'], url_path='generate', url_name='Generate Feedbacks')
