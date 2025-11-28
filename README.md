@@ -106,6 +106,11 @@ Make sure you have the following installed on your system:
     python manage.py migrate
     ```
 
+6.  **Create first superuser or admin account:**
+    ```sh
+    python manage.py createsuperuser
+    ```
+
 ## Running the Application
 
 For the application to run fully, you need to start the Redis server, the Django development server, and the Celery worker.
