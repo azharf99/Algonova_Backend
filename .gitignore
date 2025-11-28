@@ -4,7 +4,7 @@ __pycache__/
 venv/
 db.sqlite3
 media/
-mediafiles/
+mediafiles/**/*pdf
 static/admin/
 staticfiles/
 .DS_Store
