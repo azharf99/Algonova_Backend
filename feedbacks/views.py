@@ -9,6 +9,7 @@ from rest_framework.response import Response
 from feedbacks.models import Feedback
 from feedbacks.serializers import FeedbackSerializer
 from rest_framework.throttling import UserRateThrottle, AnonRateThrottle
+from groups.models import Group
 from lessons.models import Lesson
 from students.models import Student
 from utils.feedback_seeder import feedback_seeder
@@ -45,8 +46,16 @@ class FeedbackViewSet(viewsets.ModelViewSet):
     @permission_classes(permissions.IsAuthenticated)
     @action(detail=False, methods=['get'], url_path='generate', url_name='Generate Feedbacks')
     def generate_feedback(self, request, *args, **kwargs):
+        groups = Group.objects.all()
+        media_path = Path(settings.BASE_DIR, "mediafiles")
+        if not media_path.exists():
+            os.makedirs(media_path)
+        for group in groups:
+            group_dir = Path(media_path, f"{group.name}")
+            if not group_dir.exists():
+                os.makedirs(group_dir)
         group_id = request.GET.get("group_id")
-        update = request.GET.get("update").lower() == 'true'
+        update = request.GET.get("update")
         if group_id:
             is_success = feedback_seeder(Lesson, Feedback, True, group_id)
         elif update:

@@ -20,7 +20,7 @@ if settings.DEBUG:
         elif student_id:
             queryset = Feedback.objects.filter(student_id=student_id, is_sent=False)
         else:
-            return Response({"detail": "Invalid request"}, status=status.HTTP_400_BAD_REQUEST)
+            queryset = Feedback.objects.filter(is_sent=False)
         
         response = []
         for feedback in queryset:
