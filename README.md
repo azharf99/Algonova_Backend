@@ -121,9 +121,11 @@ python manage.py runserver
 
 First, ensure your Redis server is running. If you installed it locally, you can typically start it with `redis-server`.
 
+If you don't have redis server, just make sure you have Docker or Docker Desktop and pull redis docker images with `docker run -d -p 6379:6379 redis:7-alpine`.
+
 Then, open a **new terminal window**, activate the virtual environment, and start the Celery worker:
 ```sh
-celery -A Algonova_Backend worker -l info
+celery -A Algonova_Backend worker -l info -P eventlet
 ```
 This worker will listen for tasks, such as PDF generation, and execute them in the background.
 
