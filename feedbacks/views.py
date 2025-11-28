@@ -46,10 +46,13 @@ class FeedbackViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['get'], url_path='generate', url_name='Generate Feedbacks')
     def generate_feedback(self, request, *args, **kwargs):
         group_id = request.GET.get("group_id")
+        update = request.GET.get("update").lower() == 'true'
         if group_id:
             is_success = feedback_seeder(Lesson, Feedback, True, group_id)
+        elif update:
+            is_success = feedback_seeder(Lesson, Feedback, False, all=True, update=True)
         else:
-            is_success = feedback_seeder(Lesson, Feedback, False, all=False) #disable sementara
+            is_success = feedback_seeder(Lesson, Feedback, False, all=True, update=False)
         if is_success:
             return Response({
                 "detail": "Import process finished.",
