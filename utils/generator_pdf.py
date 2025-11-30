@@ -44,4 +44,6 @@ if settings.DEBUG:
                 "task_id": task.id,
                 "status": "processing"
             })
+            feedback.task_id = task.id
+        Feedback.objects.bulk_update(queryset, ['task_id'])
         return response

@@ -25,6 +25,24 @@ def create_schedule(data_list):
     return None
 
 
+def update_schedule(data_list, schedule_id):
+    if data_list:
+        url = f"https://jogja.wablas.com/api/v2/schedule/{schedule_id}"
+        headers = {
+            "Authorization": f"{token}.{secret_key}",
+            "Content-Type": "application/json"
+        }
+        response = requests.post(
+            url,
+            data=json.dumps(data_list),
+            headers=headers,
+            verify=False,
+        )
+
+        return response.json()
+    return None
+
+
 def upload_files_to_wablas(group_name, student_name, course_name, feedback_number):
 
     # file type: image, audio, video, document

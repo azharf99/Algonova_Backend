@@ -21,7 +21,7 @@ from django.http import  JsonResponse
 from weasyprint import HTML, CSS
 from utils.topic import get_competency, get_result, get_topic
 from utils.tutor_feedback import get_feedback, get_tutor_feedback
-from utils.whatsapp import create_schedule, upload_files_to_wablas
+from utils.whatsapp import create_schedule, update_schedule, upload_files_to_wablas
 from dotenv import load_dotenv
 load_dotenv()
 from django.http import JsonResponse
@@ -41,6 +41,17 @@ class FeedbackViewSet(viewsets.ModelViewSet):
         data = request.data
         if settings.DEBUG:
             async_pdf_generator(data['student'], data['course'], data['number'])
+        student = Student.objects.get(id=data["student"])
+        data_list = [
+            {
+                'category' : 'document',
+                'phone' : student.parent_contact,
+                'scheduled_at' : f'{data["lesson_date"]} {data["lesson_time"]}',
+                'text' : data['tutor_feedback'],
+                'url' : data['url_pdf'],
+            }
+        ]
+        update_schedule(data_list, data["schedule_id"])
         return super().update(request, *args, **kwargs)
 
     @permission_classes(permissions.IsAuthenticated)
@@ -127,6 +138,10 @@ def send_feedback_pdf(request):
             'text': feedback.tutor_feedback,
         }
         data_list.append(data)
+        feedback.is_sent = True
+        feedback.url_pdf = response_file['data']['messages']['url']
+        feedback.schedule_id = response_file['data']['messages']['id']
+    Feedback.objects.bulk_update(queryset, ['is_sent', 'schedule_id', 'url_pdf'])
     response = create_schedule(data_list)
 
     return JsonResponse(response)

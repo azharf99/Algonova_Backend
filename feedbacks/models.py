@@ -24,6 +24,7 @@ class Feedback(models.Model):
     lesson_time = models.TimeField(default=timezone.now)
     is_sent = models.BooleanField(default=False)
     schedule_id = models.CharField(max_length=150, blank=True, null=True)
+    task_id = models.CharField(max_length=150, blank=True, null=True)
     url_pdf = models.URLField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
