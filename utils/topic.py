@@ -102,6 +102,17 @@ topics = {
         7 : "Introduction to Databases and Web Application Data Processing",
         8 : "Completion of Web Development Project and Graduation",
     },
+    "Visual programming INDONESIA" : {
+        1 : "Pengenalan",
+        2 : "Ruang",
+        3 : "Animasi",
+        4 : "Game Pertama",
+        5 : "Operator Logika, RNG",
+        6 : "Project Group",
+        7 : "Variabel, chat bot",
+        8 : "Persiapan Project Akhir",
+        9 : "Project Akhir",
+    },
 }
 
 
@@ -209,6 +220,17 @@ modules_result = {
         7 : "Students are introduced to working with databases within a website, which provides an understanding of how to store, manage, and access the data needed for a web application. They learn about the data structure of a database, including how to design and organize data in tables for easy access and management. The material also covers the creation of dynamic and session websites, which allow users to have a more interactive and personalized experience when visiting a website. In addition, students are taught how to acquire and process data, which involves techniques for retrieving data from various sources and how to manipulate it for the purposes of a web application.",
         8 : "Students gain an in-depth look at a career as a Python developer, covering the various aspects of the job, responsibilities, and skills needed to succeed in the tech industry. They learn about the different career paths available, including web application development, data analytics, and machine learning, and how to choose a specialization that fits their interests and goals. At the end of the course, students participate in a hackathon, where they can apply the knowledge and skills they have learned to create a self-directed project. This experience helps them understand the software development process from start to finish, including team collaboration and project management.",
     },
+    "Visual programming INDONESIA" : {
+        1 : "Berkenalan dengan bentuk dan antarmuka dari website Scratch memberikan pemahaman dasar mengenai platform tersebut, termasuk bagaimana pengguna dapat berinteraksi dengan berbagai fitur yang tersedia. Selain itu, pengenalan tentang konsep loop diajarkan untuk memahami proses perulangan dalam pemrograman.",
+        2 : "Pembuatan project pertama memberikan pemahaman mengenai koordinat, derajat, dan arah. Materi ini membantu pengguna memahami bagaimana objek dapat diposisikan dan diarahkan dalam lingkungan dua dimensi",
+        3 : "Pembuatan project kedua melibatkan pembelajaran tentang kondisi dan penggunaan perintah if, yang digunakan untuk membuat keputusan berdasarkan syarat tertentu dalam kode.",
+        4 : "Memperkenalkan konsep prosedur pemrograman melalui pembuatan game pertama (project ketiga). Prosedur ini membantu menyusun program secara bulanar dan efisien.",
+        5 : "Pembelajaran mengenai operator logika, nomor acak, dan koordinat area memperkenalkan konsep-konsep yang lebih kompleks dalam pemrograman untuk pengambilan keputusan dan menghasilkan variabilitas dalam program.",
+        6 : "Pada pembuatan game kedua, diperkenalkan konsep variabel dalam pemrograman. Variabel digunakan untuk menyimpan dan memanipulasi data selama eksekusi program.",
+        7 : "Pemantapan materi mengenai variabel dilakukan dengan pembuatan project kelima berupa Chat Bot, yang menggunakan variabel untuk menyimpan dan memproses input dari pengguna.",
+        8 : "Pembelajaran berfokus ke persiapan yang dilakukan para siswa untuk membuat proyek akhirnya. Tutor akan mengajak mereka mencari ide game / animasi yang orisinil untuk nanti dibuat dan dipresentasikan di akhir modul ",
+        9 : "Pembelajaran berfokus ke penyelesaian project akhir yang telah direncanakan dan disiapkan. Pada pertemuan ke 36 , tutor mengajak para murid untuk mempresentasikan karya yang telah dibuatnya sekaligus untuk melatih kemampuan public speaking para murid",
+    },
 }
 
 
@@ -315,6 +337,17 @@ competency_result = {
         6 : "Students are introduced to the basics of building websites, which gives them a fundamental understanding of the elements involved in web development. They learn about web page formats, including the structure of HTML, CSS, and the design principles used to create attractive and functional pages. In addition, students learn how to work with maps, which may involve integrating interactive maps into a website. By the end of the course, students gain valuable experience in presenting their projects, practicing their communication skills and the ability to explain the design and function of a website to an audience.",
         7 : "Students are introduced to working with databases within a website, which provides an understanding of how to store, manage, and access the data needed for a web application. They learn about the data structure of a database, including how to design and organize data in tables for easy access and management. The material also covers the creation of dynamic and session websites, which allow users to have a more interactive and personalized experience when visiting a website. In addition, students are taught how to acquire and process data, which involves techniques for retrieving data from various sources and how to manipulate it for the purposes of a web application.",
         8 : "Students gain an in-depth look at a career as a Python developer, covering the various aspects of the job, responsibilities, and skills needed to succeed in the tech industry. They learn about the different career paths available, including web application development, data analytics, and machine learning, and how to choose a specialization that fits their interests and goals. At the end of the course, students participate in a hackathon, where they can apply the knowledge and skills they have learned to create a self-directed project. This experience helps them understand the software development process from start to finish, including team collaboration and project management.",
+    },
+    "Visual programming INDONESIA" : {
+        1 : "Pada bulan ini siswa sudah belajar tentang apa itu scratch dan apa saja yang bisa dilakukan di aplikasi tersebut, Siswa juga sudah berlatih untuk membuat karakter berbicara, sekaligus mengasah logika dengan bantuan marsbot",
+        2 : "Di bulan ini, siswa belajar membuat project pertamanya di scratch. Siswa juga belajar tentang Koordinat, bagaimana cara membuat karakter bergerak, dan belajar tentang derajat untuk mengarahkan karakter.",
+        3 : "Di bulan ini, siswa belajar untuk membuat animasi pertamanya di Scratch. Siswa juga akan belajar untuk menggunakan tombol untuk menggerakan karakter dan menjadi jembatan untuk membuat game pertamanya di bulan berikutnya ",
+        4 : "Di bulan ini, siswa belajar untuk membuat game pertamanya, mulai dari pembuatan latar, karakter hingga programnya. Dan siswa juga belajar untuk membuat pemograman lebih sederhana, dengan pemograman yang lebih terstruktur",
+        5 : 'Di bulan ini, siswa belajar tentang operator logika, angka acak, dan area koordinat. Siswa belajar apa perbedaan logika "dan", "atau", "tidak". Siswa juga mempraktekan logika dengan latihan soal soal yang berkenaan dengan logika',
+        6 : 'Di bulan ini, siswa diarahkan untuk membuat project kelompok. dan setelah project, siswa akan diajarkan sebuah materi baru "Variabel". Materi ini akan digunakan untuk membuat project selanjutnya "Chat-bot"',
+        7 : 'Di bulan ini, siswa sudah memperkuat pengetahuanya tentang Variabel, dan sudah bisa membuat project kelima yaitu "Chat-bot".',
+        8 : "Di bulan ini, siswa sudah memperkuat pengetahuan yang sudah dipelajari dari pertemuan pertama untuk membuat Proyek akhir orisinal dan dipresentasikan di depan kelas",
+        9 : 'Siswa belajar bagaimana cara melakukan presentasi dengan baik berdasarkan contoh dan penjelasan yang telah diberikan. Siswa kemudian mempresentasikan project terbaru yang telah diselesaikannya. Siswa  diajak bermain bersama untuk mendapatkan inspirasi aplikasi/game yang akan dibuat kemudian menuliskan idenya sekaligus memulai mengimplementasikan idenya menjadi sebuah aplikasi / game. Siswa telah menyelesaikan final projectnya dan tutor telah memberikan apa saja hal yang harus diperhatikan ketika mempresentasikan sebuah final project. Siswa mempresentasikan final projectnya sekaligus melanjutkan ke pengantar course selanjutnya',
     },
 }
 

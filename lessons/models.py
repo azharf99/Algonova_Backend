@@ -15,6 +15,7 @@ class Lesson(models.Model):
     date_start = models.DateField(default=timezone.now)
     time_start = models.TimeField(default=timezone.now)
     meeting_link = models.URLField(blank=True, null=True)
+    feedback = models.TextField(blank=True, null=True)
     students_attended = models.ManyToManyField(Student, related_name='attended_lessons', blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
